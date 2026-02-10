@@ -25,25 +25,13 @@ export default function Index({ masterClasses }) {
                                 {/* Image / Visual Side */}
                                 <div className="w-full lg:w-3/5 aspect-[16/10] bg-white relative overflow-hidden group shadow-sm">
                                     <div className="absolute inset-0 bg-[#F8F8F8] flex items-center justify-center">
-                                         <div className="text-center opacity-5 transition-transform duration-1000 group-hover:scale-110">
-                                            <span className="font-serif italic text-[15vw] lg:text-[8vw] text-deep-espresso uppercase tracking-tighter leading-none block">
-                                                {mc.title.split(' ')[0]}
-                                            </span>
-                                         </div>
-                                    </div>
-                                    
-                                    {/* Date Floating Card */}
-                                    <div className="absolute top-0 left-12 bg-deep-espresso text-creamy-silk px-6 py-10 flex flex-col items-center shadow-2xl">
-                                        <span className="text-4xl font-serif italic mb-2">{date.getDate()}</span>
-                                        <span className="text-[9px] uppercase tracking-[0.3em] font-bold border-t border-creamy-silk/20 pt-3">
-                                            {date.toLocaleString('ru-RU', { month: 'short' }).toUpperCase()}
-                                        </span>
-                                    </div>
-
-                                    {/* Location Overlay */}
-                                    <div className="absolute bottom-8 right-8 text-right hidden lg:block">
-                                        <p className="uppercase tracking-[0.3em] text-[8px] font-bold text-deep-espresso/30 mb-2">Локация</p>
-                                        <p className="font-serif italic text-xl text-deep-espresso">{mc.location}</p>
+                                         {mc.image_url && (
+                                             <img 
+                                                src={`/storage/${mc.image_url}`} 
+                                                alt={mc.title} 
+                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                                             />
+                                         )}
                                     </div>
                                 </div>
                                 
@@ -51,7 +39,7 @@ export default function Index({ masterClasses }) {
                                 <div className="w-full lg:w-2/5 space-y-10">
                                     <div>
                                         <p className="uppercase tracking-[0.3em] text-[10px] font-bold text-champagne-gold mb-4">
-                                            {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} • Сезонное событие
+                                            {date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} • {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                         <h2 className="font-serif italic text-5xl text-deep-espresso leading-tight">{mc.title}</h2>
                                     </div>
@@ -70,6 +58,11 @@ export default function Index({ masterClasses }) {
                                                 <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Наличие мест</p>
                                                 <p className="text-[11px] uppercase tracking-widest font-bold text-champagne-gold">{mc.capacity} Мест</p>
                                             </div>
+                                        </div>
+
+                                        <div className="pb-4">
+                                            <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Локация</p>
+                                            <p className="font-serif italic text-sm text-deep-espresso">{mc.location}</p>
                                         </div>
 
                                         <Link 

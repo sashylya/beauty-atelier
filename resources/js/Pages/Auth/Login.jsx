@@ -26,7 +26,6 @@ export default function Login({ status, canResetPassword }) {
 
             <div className="mb-10 text-center">
                 <h2 className="font-serif text-3xl italic text-[#5D2E18] mb-2">С возвращением</h2>
-                <p className="text-[10px] uppercase tracking-widest text-gray-500">Войдите, чтобы продолжить покупки</p>
             </div>
 
             {status && (
@@ -49,9 +48,10 @@ export default function Login({ status, canResetPassword }) {
                         isFocused={true}
                         placeholder="example@mail.ru"
                         onChange={(e) => setData('email', e.target.value)}
+                        required
                     />
 
-                    <InputError message={errors.email} className="mt-2 text-[10px] uppercase tracking-wider text-red-800" />
+                    <InputError message={errors.email} className="mt-2 text-[10px] tracking-wider text-red-600" />
                 </div>
 
                 <div className="mt-4">
@@ -66,32 +66,10 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="current-password"
                         placeholder="••••••••"
                         onChange={(e) => setData('password', e.target.value)}
+                        required
                     />
 
-                    <InputError message={errors.password} className="mt-2 text-[10px] uppercase tracking-wider text-red-800" />
-                </div>
-
-                <div className="mt-4 block flex justify-between items-center">
-                    <label className="flex items-center cursor-pointer group">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
-                            className="text-[#5D2E18] border-[#D4AF37] focus:ring-[#D4AF37] rounded-none"
-                        />
-                        <span className="ms-2 text-[10px] uppercase tracking-wider text-gray-500 group-hover:text-[#5D2E18] transition-colors">
-                            Запомнить меня
-                        </span>
-                    </label>
-
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="text-[9px] uppercase tracking-wider text-gray-400 hover:text-[#D4AF37] transition-colors border-b border-transparent hover:border-[#D4AF37]"
-                        >
-                            Забыли пароль?
-                        </Link>
-                    )}
+                    <InputError message={errors.password} className="mt-2 text-[10px] tracking-wider text-red-600" />
                 </div>
 
                 <div className="mt-10">

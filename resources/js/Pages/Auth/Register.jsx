@@ -45,7 +45,7 @@ export default function Register() {
                         required
                     />
 
-                    <InputError message={errors.name} className="mt-2 text-[10px] uppercase tracking-wider text-red-800" />
+                    <InputError message={errors.name} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
                 </div>
 
                 <div className="mt-4">
@@ -63,7 +63,7 @@ export default function Register() {
                         required
                     />
 
-                    <InputError message={errors.email} className="mt-2 text-[10px] uppercase tracking-wider text-red-800" />
+                    <InputError message={errors.email} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
                 </div>
 
                 <div className="mt-4">
@@ -81,7 +81,7 @@ export default function Register() {
                         required
                     />
 
-                    <InputError message={errors.password} className="mt-2 text-[10px] uppercase tracking-wider text-red-800" />
+                    <InputError message={errors.password} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
                 </div>
 
                 <div className="mt-4">
@@ -107,7 +107,7 @@ export default function Register() {
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2 text-[10px] uppercase tracking-wider text-red-800"
+                        className="mt-2 text-[10px] uppercase tracking-wider text-red-600"
                     />
                 </div>
 

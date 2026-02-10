@@ -86,7 +86,7 @@ export default function Welcome({ auth, look, hitProducts }) {
                             <div className="w-full max-w-sm space-y-8 mb-12">
                                 {look?.hotspots?.map((h) => (
                                     <Link key={h.id} href={h.product_slug ? route('catalog.show', h.product_slug) : '#'} className="flex justify-between items-center group text-[#5D2E18]">
-                                        <span className="uppercase tracking-[0.25em] text-[9px] font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
+                                        <span className="uppercase tracking-[0.25em] text-[11px] font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
                                         <span className="text-[#D4AF37] opacity-60 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300">
                                             <svg width="40" height="10" viewBox="0 0 40 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 5H39M39 5L34 1M39 5L34 9" stroke="currentColor" strokeWidth="0.5"/></svg>
                                         </span>

@@ -8,7 +8,8 @@ export default function Edit({ masterClass }) {
         ? new Date(masterClass.date_time).toISOString().slice(0, 16) 
         : '';
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
+        _method: 'put',
         title: masterClass.title || '',
         description: masterClass.description || '',
         program: masterClass.program || '',
@@ -16,11 +17,12 @@ export default function Edit({ masterClass }) {
         price: masterClass.price || '',
         capacity: masterClass.capacity || 10,
         location: masterClass.location || 'Главное Ателье, Москва',
+        image: null,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route('admin.master-classes.update', masterClass.id));
+        post(route('admin.master-classes.update', masterClass.id));
     };
 
     return (
@@ -48,6 +50,29 @@ export default function Edit({ masterClass }) {
                             className="w-full border-[#3D2B1F]/20 focus:border-[#D4AF37] focus:ring-0 text-[#3D2B1F] placeholder-gray-400 p-3"
                         />
                         {errors.title && <div className="text-red-500 text-xs mt-1">{errors.title}</div>}
+                    </div>
+
+                    <div>
+                        <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="image">
+                            Фотография мастер-класса
+                        </label>
+                        {masterClass.image_url && (
+                            <div className="mb-4">
+                                <img 
+                                    src={`/storage/${masterClass.image_url}`} 
+                                    alt="Current" 
+                                    className="w-40 h-24 object-cover border border-[#3D2B1F]/10" 
+                                />
+                                <p className="text-[8px] uppercase tracking-widest text-gray-400 mt-2">Текущее фото</p>
+                            </div>
+                        )}
+                        <input
+                            type="file"
+                            id="image"
+                            onChange={(e) => setData('image', e.target.files[0])}
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F] file:text-white hover:file:bg-[#8B5A2B] transition-all"
+                        />
+                        {errors.image && <div className="text-red-500 text-xs mt-1">{errors.image}</div>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -18,8 +18,7 @@ export default function GuestLayout({ children }) {
                 
                 {/* Brand Overlay */}
                 <div className="absolute bottom-12 left-12 text-[#5D2E18]">
-                     <h2 className="font-serif text-4xl italic mb-2">The Art of Beauty</h2>
-                     <p className="uppercase tracking-[0.3em] text-[10px] font-bold">Est. 2026</p>
+                     <h2 className="font-serif text-4xl italic mb-2">Искусство красоты</h2>
                 </div>
             </div>
 

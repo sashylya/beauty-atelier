@@ -11,6 +11,7 @@ export default function Create() {
         price: '',
         capacity: 10,
         location: 'Главное Ателье, Москва',
+        image: null,
     });
 
     const handleSubmit = (e) => {
@@ -44,6 +45,19 @@ export default function Create() {
                             placeholder="Например: Искусство макияжа для себя"
                         />
                         {errors.title && <div className="text-red-500 text-xs mt-1">{errors.title}</div>}
+                    </div>
+
+                    <div>
+                        <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="image">
+                            Фотография мастер-класса
+                        </label>
+                        <input
+                            type="file"
+                            id="image"
+                            onChange={(e) => setData('image', e.target.files[0])}
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F] file:text-white hover:file:bg-[#8B5A2B] transition-all"
+                        />
+                        {errors.image && <div className="text-red-500 text-xs mt-1">{errors.image}</div>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

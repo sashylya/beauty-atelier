@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterClass;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class MasterClassController extends Controller
 {
@@ -32,7 +33,12 @@ class MasterClassController extends Controller
             'price' => 'required|numeric|min:0',
             'capacity' => 'required|integer|min:1',
             'location' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_url'] = $request->file('image')->store('master-classes', 'public');
+        }
 
         MasterClass::create($validated);
 
@@ -56,7 +62,15 @@ class MasterClassController extends Controller
             'price' => 'required|numeric|min:0',
             'capacity' => 'required|integer|min:1',
             'location' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($masterClass->image_url) {
+                Storage::disk('public')->delete($masterClass->image_url);
+            }
+            $validated['image_url'] = $request->file('image')->store('master-classes', 'public');
+        }
 
         $masterClass->update($validated);
 
