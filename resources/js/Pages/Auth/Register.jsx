@@ -21,12 +21,7 @@ export default function Register() {
         post(route('register'));
     };
 
-    // Добавляем проверку имени
-    const isNameValid = /^[A-Za-zА-Яа-яЁё\s\-]+$/.test(data.name);
-    // Проверка Email (минимум: наличие точки в домене)
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-
-    // Функция для проверки сложности пароля на лету (клиентская валидация)
+    // Функция для проверки сложности пароля на лету
     const validatePassword = (pass) => {
         return {
             length: pass.length >= 8,
@@ -42,78 +37,77 @@ export default function Register() {
         <BeautyLayout>
             <Head title="Регистрация | Beauty Atelier" />
 
-            <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#FDFBF9]">
-                <div className="w-full sm:max-w-md mt-6 px-8 py-10 bg-white shadow-sm overflow-hidden sm:rounded-lg border border-[#E8D9D0]">
-                    <h2 className="text-3xl font-serif text-[#4A3E3E] text-center mb-8">Создание аккаунта</h2>
+            <div className="auth-page">
+                <div className="auth-card">
+                    <h2 className="auth-title">Создание аккаунта</h2>
 
                     <form onSubmit={submit}>
-                        <div>
-                            <label className="block font-medium text-sm text-[#8C7A7A]">Ваше имя</label>
+                        <div className="auth-form-group">
+                            <label className="auth-label">Ваше имя</label>
                             <input
                                 type="text"
-                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                className="auth-input"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                             />
-                            {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
+                            {errors.name && <div className="auth-error">{errors.name}</div>}
                         </div>
 
-                        <div className="mt-4">
-                            <label className="block font-medium text-sm text-[#8C7A7A]">Email</label>
+                        <div className="auth-form-group">
+                            <label className="auth-label">Email</label>
                             <input
                                 type="email"
-                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                className="auth-input"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                             />
-                            {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
+                            {errors.email && <div className="auth-error">{errors.email}</div>}
                         </div>
 
-                        <div className="mt-4">
-                            <label className="block font-medium text-sm text-[#8C7A7A]">Пароль</label>
+                        <div className="auth-form-group">
+                            <label className="auth-label">Пароль</label>
                             <input
                                 type="password"
-                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                className="auth-input"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
                             />
                             
-                            {/* Индикатор сложности для диплома */}
-                            <div className="mt-2 text-[10px] grid grid-cols-2 gap-1">
-                                <span className={passCheck.length ? 'text-green-600' : 'text-gray-400'}>● 8+ символов</span>
-                                <span className={passCheck.mixed ? 'text-green-600' : 'text-gray-400'}>● Регистр (Aa)</span>
-                                <span className={passCheck.number ? 'text-green-600' : 'text-gray-400'}>● Цифры (123)</span>
-                                <span className={passCheck.symbol ? 'text-green-600' : 'text-gray-400'}>● Спецсимволы (#!)</span>
+                            <div className="pass-check-grid">
+                                <span className={`pass-check-item ${passCheck.length ? 'valid' : ''}`}>● 8+ символов</span>
+                                <span className={`pass-check-item ${passCheck.mixed ? 'valid' : ''}`}>● Регистр (Aa)</span>
+                                <span className={`pass-check-item ${passCheck.number ? 'valid' : ''}`}>● Цифры (123)</span>
+                                <span className={`pass-check-item ${passCheck.symbol ? 'valid' : ''}`}>● Спецсимволы (#!)</span>
                             </div>
                             
-                            {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+                            {errors.password && <div className="auth-error">{errors.password}</div>}
                         </div>
 
-                        <div className="mt-4">
-                            <label className="block font-medium text-sm text-[#8C7A7A]">Подтверждение пароля</label>
+                        <div className="auth-form-group">
+                            <label className="auth-label">Подтверждение пароля</label>
                             <input
                                 type="password"
-                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                className="auth-input"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required
                             />
                         </div>
 
-                        <div className="flex items-center justify-between mt-8">
-                            <Link href={route('login')} className="text-sm text-[#8C7A7A] hover:text-[#C4A484] underline">
+                        <div className="auth-footer">
+                            <Link href={route('login')} className="auth-link">
                                 Уже есть аккаунт?
                             </Link>
 
                             <button
                                 type="submit"
-                                className="inline-flex items-center px-6 py-3 bg-[#4A3E3E] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#5D4E4E] active:bg-[#3D3333] transition ease-in-out duration-150"
+                                className="auth-button"
                                 disabled={processing}
                             >
-                                Зарегистрироваться
+                                Регистрация
                             </button>
                         </div>
                     </form>

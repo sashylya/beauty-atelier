@@ -1,32 +1,33 @@
 import React, { useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function Login() {
+export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
+        token: token,
+        email: email,
         password: '',
-        remember: false,
+        password_confirmation: '',
     });
 
     useEffect(() => {
         return () => {
-            reset('password');
+            reset('password', 'password_confirmation');
         };
     }, []);
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('password.store'));
     };
 
     return (
         <BeautyLayout>
-            <Head title="Вход | Beauty Atelier" />
+            <Head title="Новый пароль | Beauty Atelier" />
 
             <div className="auth-page">
                 <div className="auth-card">
-                    <h2 className="auth-title">Вход в личный кабинет</h2>
+                    <h2 className="auth-title">Создание нового пароля</h2>
 
                     <form onSubmit={submit}>
                         <div className="auth-form-group">
@@ -42,48 +43,40 @@ export default function Login() {
                             {errors.email && <div className="auth-error">{errors.email}</div>}
                         </div>
 
-                        <div className="auth-form-group">
-                            <label className="auth-label">Пароль</label>
+                        <div className="auth-form-group mt-4">
+                            <label className="auth-label">Новый пароль</label>
                             <input
                                 type="password"
                                 className="auth-input"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
-                                autoComplete="current-password"
+                                autoComplete="new-password"
+                                autoFocus
                             />
                             {errors.password && <div className="auth-error">{errors.password}</div>}
                         </div>
 
-                        <div className="auth-form-group">
-                            <label className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    name="remember"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="auth-checkbox"
-                                />
-                                <span className="ms-2 text-sm text-[#8C7A7A]">Запомнить меня</span>
-                            </label>
+                        <div className="auth-form-group mt-4">
+                            <label className="auth-label">Подтверждение пароля</label>
+                            <input
+                                type="password"
+                                className="auth-input"
+                                value={data.password_confirmation}
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                required
+                                autoComplete="new-password"
+                            />
+                            {errors.password_confirmation && <div className="auth-error">{errors.password_confirmation}</div>}
                         </div>
 
-                        <div className="auth-footer">
-                            <div className="flex flex-col gap-2">
-                                <Link href={route('register')} className="auth-link">
-                                    Создать аккаунт
-                                </Link>
-                                <Link href={route('password.request')} className="auth-link">
-                                    Забыли пароль?
-                                </Link>
-                            </div>
-
+                        <div className="flex items-center justify-center mt-8">
                             <button
                                 type="submit"
-                                className="auth-button"
+                                className="auth-button auth-button-full"
                                 disabled={processing}
                             >
-                                Войти
+                                Сбросить пароль
                             </button>
                         </div>
                     </form>
