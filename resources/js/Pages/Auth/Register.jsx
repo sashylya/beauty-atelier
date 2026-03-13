@@ -1,7 +1,5 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import React, { useEffect } from 'react';
+import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
@@ -12,122 +10,115 @@ export default function Register() {
         password_confirmation: '',
     });
 
+    useEffect(() => {
+        return () => {
+            reset('password', 'password_confirmation');
+        };
+    }, []);
+
     const submit = (e) => {
         e.preventDefault();
-
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+        post(route('register'));
     };
 
+    // Добавляем проверку имени
+    const isNameValid = /^[A-Za-zА-Яа-яЁё\s\-]+$/.test(data.name);
+    // Проверка Email (минимум: наличие точки в домене)
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+
+    // Функция для проверки сложности пароля на лету (клиентская валидация)
+    const validatePassword = (pass) => {
+        return {
+            length: pass.length >= 8,
+            mixed: /[a-z]/.test(pass) && /[A-Z]/.test(pass),
+            number: /[0-9]/.test(pass),
+            symbol: /[^A-Za-z0-9]/.test(pass),
+        };
+    };
+
+    const passCheck = validatePassword(data.password);
+
     return (
-        <GuestLayout>
-            <Head title="Регистрация" />
+        <BeautyLayout>
+            <Head title="Регистрация | Beauty Atelier" />
 
-            <div className="mb-10 text-center">
-                <h2 className="font-serif text-3xl italic text-[#5D2E18] mb-2">Стать клиентом</h2>
-                <p className="text-[10px] uppercase tracking-widest text-gray-500">Присоединяйтесь к миру Beauty Atelier</p>
+            <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#FDFBF9]">
+                <div className="w-full sm:max-w-md mt-6 px-8 py-10 bg-white shadow-sm overflow-hidden sm:rounded-lg border border-[#E8D9D0]">
+                    <h2 className="text-3xl font-serif text-[#4A3E3E] text-center mb-8">Создание аккаунта</h2>
+
+                    <form onSubmit={submit}>
+                        <div>
+                            <label className="block font-medium text-sm text-[#8C7A7A]">Ваше имя</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                required
+                            />
+                            {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block font-medium text-sm text-[#8C7A7A]">Email</label>
+                            <input
+                                type="email"
+                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                required
+                            />
+                            {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block font-medium text-sm text-[#8C7A7A]">Пароль</label>
+                            <input
+                                type="password"
+                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                required
+                            />
+                            
+                            {/* Индикатор сложности для диплома */}
+                            <div className="mt-2 text-[10px] grid grid-cols-2 gap-1">
+                                <span className={passCheck.length ? 'text-green-600' : 'text-gray-400'}>● 8+ символов</span>
+                                <span className={passCheck.mixed ? 'text-green-600' : 'text-gray-400'}>● Регистр (Aa)</span>
+                                <span className={passCheck.number ? 'text-green-600' : 'text-gray-400'}>● Цифры (123)</span>
+                                <span className={passCheck.symbol ? 'text-green-600' : 'text-gray-400'}>● Спецсимволы (#!)</span>
+                            </div>
+                            
+                            {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+                        </div>
+
+                        <div className="mt-4">
+                            <label className="block font-medium text-sm text-[#8C7A7A]">Подтверждение пароля</label>
+                            <input
+                                type="password"
+                                className="mt-1 block w-full border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
+                                value={data.password_confirmation}
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between mt-8">
+                            <Link href={route('login')} className="text-sm text-[#8C7A7A] hover:text-[#C4A484] underline">
+                                Уже есть аккаунт?
+                            </Link>
+
+                            <button
+                                type="submit"
+                                className="inline-flex items-center px-6 py-3 bg-[#4A3E3E] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#5D4E4E] active:bg-[#3D3333] transition ease-in-out duration-150"
+                                disabled={processing}
+                            >
+                                Зарегистрироваться
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <form onSubmit={submit} className="space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Имя" className="uppercase tracking-widest text-[9px] text-gray-500 mb-2" />
-
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="block w-full border-0 border-b border-[#D4AF37] bg-transparent focus:border-[#5D2E18] focus:ring-0 px-0 py-2 text-[#5D2E18] placeholder-gray-300 transition-colors"
-                        autoComplete="name"
-                        isFocused={true}
-                        placeholder="Александра"
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.name} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" className="uppercase tracking-widest text-[9px] text-gray-500 mb-2" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="block w-full border-0 border-b border-[#D4AF37] bg-transparent focus:border-[#5D2E18] focus:ring-0 px-0 py-2 text-[#5D2E18] placeholder-gray-300 transition-colors"
-                        autoComplete="username"
-                        placeholder="example@mail.ru"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.email} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Пароль" className="uppercase tracking-widest text-[9px] text-gray-500 mb-2" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="block w-full border-0 border-b border-[#D4AF37] bg-transparent focus:border-[#5D2E18] focus:ring-0 px-0 py-2 text-[#5D2E18] placeholder-gray-300 transition-colors"
-                        autoComplete="new-password"
-                        placeholder="••••••••"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2 text-[10px] uppercase tracking-wider text-red-600" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Подтверждение пароля"
-                        className="uppercase tracking-widest text-[9px] text-gray-500 mb-2"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="block w-full border-0 border-b border-[#D4AF37] bg-transparent focus:border-[#5D2E18] focus:ring-0 px-0 py-2 text-[#5D2E18] placeholder-gray-300 transition-colors"
-                        autoComplete="new-password"
-                        placeholder="••••••••"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2 text-[10px] uppercase tracking-wider text-red-600"
-                    />
-                </div>
-
-                <div className="mt-10">
-                    <button 
-                        type="submit"
-                        disabled={processing}
-                        className="w-full bg-[#5D2E18] text-white uppercase tracking-[0.2em] text-[10px] font-bold py-4 hover:bg-[#4A2512] transition-colors disabled:opacity-50"
-                    >
-                        Зарегистрироваться
-                    </button>
-                </div>
-                
-                <div className="mt-6 text-center">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">Уже есть аккаунт? </span>
-                    <Link href={route('login')} className="text-[10px] uppercase tracking-wider text-[#5D2E18] font-bold hover:text-[#D4AF37] border-b border-[#5D2E18] hover:border-[#D4AF37] transition-all ml-2">
-                        Войти
-                    </Link>
-                </div>
-            </form>
-        </GuestLayout>
+        </BeautyLayout>
     );
 }

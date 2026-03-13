@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "name": "Тональная основа для лица",
+        "slug": "tonalnaia-osnova-dlia-lica"
+    },
+    {
+        "id": 3,
+        "name": "Увлажняющая губная помада",
+        "slug": "uvlazniaiushhaia-gubnaia-pomada"
+    },
+    {
+        "id": 6,
+        "name": "Сияющая тональная основа для лица",
+        "slug": "siiaiushhaia-tonalnaia-osnova-dlia-lica"
+    },
+    {
+        "id": 7,
+        "name": "Губная помада",
+        "slug": "gubnaia-pomada"
+    },
+    {
+        "id": 8,
+        "name": "Тушь для ресниц с эффектом 4D",
+        "slug": "tus-dlia-resnic-s-effektom-4d"
+    }
+]

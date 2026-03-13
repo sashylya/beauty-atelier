@@ -1,64 +1,60 @@
 import React from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function TwoFactor({ status }) {
+export default function TwoFactor() {
     const { data, setData, post, processing, errors } = useForm({
         code: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('two-factor.store'));
+        post(route('2fa.store'));
     };
 
     return (
         <BeautyLayout>
-            <Head title="Двухфакторная аутентификация" />
+            <Head title="Подтверждение входа | Beauty Atelier" />
 
-            <div className="max-w-md mx-auto py-20 px-6">
-                <div className="bg-white p-10 shadow-2xl border border-deep-espresso/5 text-center">
-                    <h1 className="font-serif italic text-4xl text-deep-espresso mb-6">Проверка доступа</h1>
-                    <p className="text-xs uppercase tracking-widest text-deep-espresso/50 mb-10 leading-relaxed">
-                        Мы отправили 6-значный код на ваш Email. <br/> Пожалуйста, введите его ниже для входа.
-                    </p>
+            <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-[#FDFBF9]">
+                <div className="w-full sm:max-w-md mt-6 px-8 py-10 bg-white shadow-sm overflow-hidden sm:rounded-lg border border-[#E8D9D0]">
+                    <h2 className="text-3xl font-serif text-[#4A3E3E] text-center mb-6">Двухфакторная проверка</h2>
 
-                    {status && <div className="mb-6 text-sm text-champagne-gold font-medium">{status}</div>}
+                    <div className="mb-8 text-sm text-[#8C7A7A] leading-relaxed text-center">
+                        На ваш Email был отправлен 6-значный код подтверждения. 
+                        Пожалуйста, введите его ниже для входа в личный кабинет.
+                    </div>
 
-                    <form onSubmit={submit} className="space-y-8">
+                    <form onSubmit={submit}>
                         <div>
+                            <label className="block font-medium text-sm text-[#8C7A7A] text-center mb-4">Код из письма</label>
                             <input
                                 type="text"
-                                name="code"
+                                className="block w-full text-center text-2xl tracking-[1em] border-[#E8D9D0] focus:border-[#C4A484] focus:ring-[#C4A484] rounded-md shadow-sm"
                                 value={data.code}
-                                className="w-full text-center text-3xl font-serif tracking-[0.5em] border-b border-deep-espresso/20 focus:border-champagne-gold transition-colors py-4 bg-transparent outline-none"
                                 onChange={(e) => setData('code', e.target.value)}
-                                placeholder="000000"
                                 required
                                 autoFocus
+                                maxLength="6"
+                                placeholder="000000"
                             />
-                            {errors.code && <p className="mt-2 text-[10px] text-red-500 uppercase tracking-widest">{errors.code}</p>}
+                            {errors.code && <div className="text-red-500 text-xs mt-2 text-center">{errors.code}</div>}
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-champagne-gold transition-all duration-500 shadow-xl"
-                        >
-                            {processing ? 'Проверка...' : 'Войти'}
-                        </button>
-                    </form>
-
-                    <div className="mt-12 pt-8 border-t border-deep-espresso/5">
-                        <form onSubmit={(e) => { e.preventDefault(); post(route('two-factor.resend')); }}>
+                        <div className="flex flex-col items-center mt-8">
                             <button
                                 type="submit"
-                                className="text-[9px] uppercase tracking-widest font-bold text-deep-espresso/40 hover:text-champagne-gold transition-colors"
+                                className="w-full inline-flex justify-center items-center px-6 py-3 bg-[#4A3E3E] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#5D4E4E] transition ease-in-out duration-150"
+                                disabled={processing}
                             >
-                                Не получили код? Отправить снова
+                                Подтвердить вход
                             </button>
-                        </form>
-                    </div>
+                            
+                            <p className="mt-4 text-xs text-[#8C7A7A]">
+                                Код действителен в течение 10 минут.
+                            </p>
+                        </div>
+                    </form>
                 </div>
             </div>
         </BeautyLayout>

@@ -3,52 +3,57 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Inertia\Inertia;
+use Inertia\Response;
+use Carbon\Carbon;
 
 class TwoFactorController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response|RedirectResponse
     {
+        // Если в сессии нет ID пользователя, отправляем на логин
+        if (!$request->session()->has('2fa_user_id')) {
+            return redirect()->route('login');
+        }
+
         return Inertia::render('Auth/TwoFactor');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'code' => 'required|string',
+            'code' => 'required|numeric',
+        ], [
+            'code.required' => 'Введите код подтверждения.',
+            'code.numeric' => 'Код должен состоять только из цифр.',
         ]);
 
-        $user = User::find(session('auth.id'));
-
-        if (!$user || $user->two_factor_code !== $request->code || $user->two_factor_expires_at < now()) {
-            return back()->withErrors(['code' => 'Неверный или просроченный код.']);
+        if (!$request->session()->has('2fa_user_id')) {
+            return redirect()->route('login');
         }
 
-        // Очищаем код
-        $user->resetTwoFactorCode();
+        $user = User::find($request->session()->get('2fa_user_id'));
 
-        // Авторизуем
-        Auth::login($user);
-        $request->session()->regenerate();
+        // Проверяем код и время его жизни
+        if ($user->two_factor_code == $request->code && Carbon::now()->lt($user->two_factor_expires_at)) {
+            // Очищаем код в базе
+            $user->update([
+                'two_factor_code' => null,
+                'two_factor_expires_at' => null,
+            ]);
 
-        if ($user->is_admin) {
-            return redirect()->route('admin.dashboard');
+            // Удаляем временный ID из сессии и логиним пользователя
+            $request->session()->forget('2fa_user_id');
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('home'));
         }
 
-        return redirect()->intended(route('dashboard'));
-    }
-
-    public function resend()
-    {
-        $user = User::find(session('auth.id'));
-        $user->generateTwoFactorCode();
-        
-        // Здесь должна быть отправка Email, но для проекта мы просто выведем в логи
-        \Log::info("Код 2FA для {$user->email}: {$user->two_factor_code}");
-
-        return back()->with('status', 'Новый код отправлен на ваш Email.');
+        return back()->withErrors(['code' => 'Неверный код или срок его действия истек.']);
     }
 }

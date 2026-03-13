@@ -40,17 +40,20 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit');
     }
 
+    /**
+     * Обновить настройки двухфакторной аутентификации.
+     */
     public function updateTwoFactor(Request $request): RedirectResponse
     {
         $request->validate([
-            'is_two_factor_enabled' => 'required|boolean',
+            'is_two_factor_enabled' => ['required', 'boolean'],
         ]);
 
         $request->user()->update([
             'is_two_factor_enabled' => $request->is_two_factor_enabled,
         ]);
 
-        return back();
+        return back()->with('status', 'two-factor-updated');
     }
 
     /**

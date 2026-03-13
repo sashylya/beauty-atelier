@@ -31,7 +31,7 @@ Route::post('/cart/remove/{sku}', [CartController::class, 'remove'])->name('cart
 Route::patch('/cart/update/{sku}', [CartController::class, 'updateQuantity'])->name('cart.update');
 Route::post('/cart/toggle-packaging', [CartController::class, 'togglePackaging'])->name('cart.toggle-packaging');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         $orders = Auth::user()->orders()->with('items.sku.product')->latest()->get();
         $bookings = Auth::user()->bookings()->with('masterClass')->latest()->get();
@@ -60,5 +60,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
     Route::delete('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'destroy'])->name('bookings.destroy');
 });
+
 
 require __DIR__.'/auth.php';
