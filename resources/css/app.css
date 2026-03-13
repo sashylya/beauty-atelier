@@ -98,7 +98,19 @@
     color: #ef4444;
     font-size: 0.75rem;
     line-height: 1rem;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.auth-status {
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #16a34a;
+    text-align: center;
+    background-color: #f0fdf4;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid #bcf0da;
 }
 
 .auth-link {

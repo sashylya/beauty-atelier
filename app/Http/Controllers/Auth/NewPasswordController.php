@@ -37,7 +37,15 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required', 
+                'confirmed', 
+                Rules\Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
@@ -57,12 +65,18 @@ class NewPasswordController extends Controller
 
         // If the password was successfully reset, we will redirect the user back to
         // the login view with a success message.
-        if ($status == Password::RESET_PASSWORD) {
-            return redirect()->route('login')->with('status', __($status));
+        if ($status == Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('status', 'Ваш пароль был успешно изменен.');
+        }
+
+        // Ручной перевод ошибок
+        $errorMessage = 'Этот токен сброса пароля недействителен.';
+        if ($status == Password::INVALID_USER) {
+            $errorMessage = 'Мы не можем найти пользователя с таким Email адресом.';
         }
 
         throw ValidationException::withMessages([
-            'email' => [__($status)],
+            'email' => [$errorMessage],
         ]);
     }
 }

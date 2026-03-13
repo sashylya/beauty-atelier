@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Login() {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -27,6 +27,12 @@ export default function Login() {
             <div className="auth-page">
                 <div className="auth-card">
                     <h2 className="auth-title">Вход в личный кабинет</h2>
+
+                    {status && (
+                        <div className="auth-status">
+                            {status}
+                        </div>
+                    )}
 
                     <form onSubmit={submit}>
                         <div className="auth-form-group">

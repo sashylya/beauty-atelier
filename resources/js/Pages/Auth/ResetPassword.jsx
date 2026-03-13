@@ -21,6 +21,18 @@ export default function ResetPassword({ token, email }) {
         post(route('password.store'));
     };
 
+    // Функция для проверки сложности пароля на лету (такая же как в Register.jsx)
+    const validatePassword = (pass) => {
+        return {
+            length: pass.length >= 8,
+            mixed: /[a-z]/.test(pass) && /[A-Z]/.test(pass),
+            number: /[0-9]/.test(pass),
+            symbol: /[^A-Za-z0-9]/.test(pass),
+        };
+    };
+
+    const passCheck = validatePassword(data.password);
+
     return (
         <BeautyLayout>
             <Head title="Новый пароль | Beauty Atelier" />
@@ -54,6 +66,15 @@ export default function ResetPassword({ token, email }) {
                                 autoComplete="new-password"
                                 autoFocus
                             />
+                            
+                            {/* Индикатор сложности для соблюдения стандартов регистрации */}
+                            <div className="pass-check-grid">
+                                <span className={`pass-check-item ${passCheck.length ? 'valid' : ''}`}>● 8+ символов</span>
+                                <span className={`pass-check-item ${passCheck.mixed ? 'valid' : ''}`}>● Регистр (Aa)</span>
+                                <span className={`pass-check-item ${passCheck.number ? 'valid' : ''}`}>● Цифры (123)</span>
+                                <span className={`pass-check-item ${passCheck.symbol ? 'valid' : ''}`}>● Спецсимволы (#!)</span>
+                            </div>
+                            
                             {errors.password && <div className="auth-error">{errors.password}</div>}
                         </div>
 

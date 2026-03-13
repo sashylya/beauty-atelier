@@ -26,7 +26,7 @@ export default function ForgotPassword({ status }) {
                     </div>
 
                     {status && (
-                        <div className="mb-4 font-medium text-sm text-green-600 text-center bg-green-50 p-3 rounded">
+                        <div className="auth-status">
                             {status}
                         </div>
                     )}
@@ -45,7 +45,7 @@ export default function ForgotPassword({ status }) {
                             {errors.email && <div className="auth-error">{errors.email}</div>}
                         </div>
 
-                        <div className="flex items-center justify-center mt-8">
+                        <div className="auth-footer">
                             <button
                                 type="submit"
                                 className="auth-button auth-button-full"

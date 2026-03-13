@@ -24,8 +24,6 @@ class PasswordResetLinkController extends Controller
 
     /**
      * Handle an incoming password reset link request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -33,18 +31,22 @@ class PasswordResetLinkController extends Controller
             'email' => 'required|email',
         ]);
 
-        // We will send the password reset link to this user. Once it has been sent
-        // we will examine the response then see the message we need to show to the user.
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
         if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+            return back()->with('status', 'Ссылка для сброса пароля отправлена на ваш Email.');
+        }
+
+        // Ручной перевод ошибок для диплома
+        $errorMessage = 'Мы не можем найти пользователя с таким Email адресом.';
+        if ($status == Password::RESET_THROTTLED) {
+            $errorMessage = 'Пожалуйста, подождите перед повторной попыткой.';
         }
 
         throw ValidationException::withMessages([
-            'email' => [__($status)],
+            'email' => [$errorMessage],
         ]);
     }
 }
