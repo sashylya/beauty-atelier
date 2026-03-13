@@ -50,6 +50,16 @@ export default function BeautyLayout({ children }) {
                              <button onClick={() => setIsSearchOpen(true)} className="hover:text-black transition uppercase tracking-[0.1em]">Поиск</button>
                          )}
                          
+                         {auth.user && auth.user.is_admin && (
+                             <Link 
+                                 href={route('admin.dashboard')} 
+                                 className="px-4 py-2 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition-all rounded-sm font-semibold tracking-[0.2em]"
+                                 style={{ fontSize: '9px' }}
+                             >
+                                Админ-панель
+                             </Link>
+                         )}
+
                          {auth.user ? (
                              <Link href={route('dashboard')} className="hover:text-black transition">
                                 Личный кабинет

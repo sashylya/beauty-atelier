@@ -77,4 +77,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Логи входа пользователя.
+     */
+    public function loginLogs()
+    {
+        return $this->hasMany(LoginLog::class, 'email', 'email');
+    }
 }

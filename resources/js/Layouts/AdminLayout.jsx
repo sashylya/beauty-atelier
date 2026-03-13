@@ -10,6 +10,7 @@ export default function AdminLayout({ children }) {
         { label: 'Образ месяца', href: route('admin.look.edit'), active: url.startsWith('/admin/look') },
         { label: 'Заказы', href: route('admin.dashboard'), active: url.startsWith('/admin/orders') }, 
         { label: 'Мастер-классы', href: route('admin.master-classes.index'), active: url.startsWith('/admin/master-classes') },
+        { label: 'Пользователи', href: route('admin.users.index'), active: url.startsWith('/admin/users') },
     ];
 
     return (

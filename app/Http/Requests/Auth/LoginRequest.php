@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\LoginLog;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -21,8 +23,6 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -41,21 +41,63 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        $email = $this->string('email');
+        $ip = $this->ip();
+        $userAgent = $this->userAgent();
+
+        // Попытка входа
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // Логируем неудачу
+            LoginLog::create([
+                'email' => $email,
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+                'is_successful' => false,
+                'error_message' => 'Неверный пароль',
+            ]);
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'Неверный адрес электронной почты или пароль.',
             ]);
         }
+
+        // Дополнительная проверка на блокировку админом
+        $user = Auth::user();
+        if (!$user->is_active) {
+            Auth::logout();
+            
+            // Логируем блокировку
+            LoginLog::create([
+                'email' => $email,
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+                'is_successful' => false,
+                'error_message' => 'Аккаунт заблокирован',
+            ]);
+
+            throw ValidationException::withMessages([
+                'email' => 'Ваш аккаунт заблокирован администратором.',
+            ]);
+        }
+
+        // Логируем успех
+        LoginLog::create([
+            'email' => $email,
+            'ip_address' => $ip,
+            'user_agent' => $userAgent,
+            'is_successful' => true,
+        ]);
+
+        // Обновляем дату последнего входа
+        $user->update(['last_login_at' => now()]);
 
         RateLimiter::clear($this->throttleKey());
     }
 
     /**
      * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function ensureIsNotRateLimited(): void
     {
@@ -66,12 +108,19 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+        $minutes = ceil($seconds / 60);
+
+        // Логируем попытку подбора (Brute Force)
+        LoginLog::create([
+            'email' => $this->string('email'),
+            'ip_address' => $this->ip(),
+            'user_agent' => $this->userAgent(),
+            'is_successful' => false,
+            'error_message' => 'Блокировка по превышению лимита попыток',
+        ]);
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => "Слишком много попыток входа. Пожалуйста, попробуйте через {$minutes} мин.",
         ]);
     }
 
