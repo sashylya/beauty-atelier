@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@atelier.com'],
             [
                 'name' => 'Admin User',
-                'password' => bcrypt('password'),
+                'password' => 'password',
                 'is_admin' => true,
             ]
         );
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'user@atelier.com'],
             [
                 'name' => 'Auth User',
-                'password' => bcrypt('password'),
+                'password' => 'password',
                 'is_admin' => false,
             ]
         );

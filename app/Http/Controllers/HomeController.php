@@ -35,6 +35,12 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
+        // 3. Загружаем последние статьи для блока "Дневник Ателье"
+        $latestPosts = \App\Models\Post::where('is_active', true)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -42,6 +48,7 @@ class HomeController extends Controller
             'phpVersion' => PHP_VERSION,
             'look' => $look,
             'hitProducts' => $hitProducts,
+            'latestPosts' => $latestPosts,
         ]);
     }
 }

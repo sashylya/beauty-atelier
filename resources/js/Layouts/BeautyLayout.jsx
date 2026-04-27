@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 
 export default function BeautyLayout({ children }) {
-    const { cartCount, auth } = usePage().props;
+    const { cartCount, wishlistCount, auth } = usePage().props;
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,7 +22,7 @@ export default function BeautyLayout({ children }) {
                         <Link href={route('about')} className="hover:text-black transition-colors">Ателье</Link>
                         <Link href={route('master-classes.index')} className="hover:text-black transition-colors">Мастер-классы</Link>
                         <Link href={route('catalog.index')} className="hover:text-black transition-colors">Каталог</Link>
-                        <a href="#" className="hover:text-black transition-colors">Космо-блог</a>
+                        <Link href={route('blog.index')} className="hover:text-black transition-colors">Космо-блог</Link>
                     </nav>
 
                     {/* Logo */}
@@ -60,6 +60,16 @@ export default function BeautyLayout({ children }) {
                              </Link>
                          )}
 
+                         {auth.user && auth.user.is_cosmetologist && !auth.user.is_admin && (
+                             <Link 
+                                 href={route('cosmetologist.dashboard')} 
+                                 className="px-4 py-2 border border-champagne-gold text-champagne-gold hover:bg-champagne-gold hover:text-white transition-all rounded-sm font-semibold tracking-[0.2em]"
+                                 style={{ fontSize: '9px' }}
+                             >
+                                Панель специалиста
+                             </Link>
+                         )}
+
                          {auth.user ? (
                              <Link href={route('dashboard')} className="hover:text-black transition">
                                 Личный кабинет
@@ -73,6 +83,11 @@ export default function BeautyLayout({ children }) {
                          <Link href={route('cart.index')} className="hover:text-black transition flex items-center gap-2">
                             Корзина
                             <span className="">({cartCount || 0})</span>
+                         </Link>
+
+                         <Link href={route('wishlist.index')} className="hover:text-black transition flex items-center gap-2 ml-4">
+                            Избранное
+                            <span className="">({wishlistCount || 0})</span>
                          </Link>
                     </div>
                 </div>
@@ -100,7 +115,7 @@ export default function BeautyLayout({ children }) {
                             <p className="text-black mb-6 tracking-widest">Меню</p>
                             <Link href={route('master-classes.index')} className="block hover:text-black transition text-gray-500">Мастер-классы</Link>
                             <Link href={route('catalog.index')} className="block hover:text-black transition text-gray-500">Каталог</Link>
-                            <Link href="#" className="block hover:text-black transition text-gray-500">Космо-блог</Link>
+                            <Link href={route('blog.index')} className="block hover:text-black transition text-gray-500">Космо-блог</Link>
                             <Link href={route('about')} className="block hover:text-black transition text-gray-500">Ателье</Link>
                         </div>
                         <div className="text-[10px] uppercase tracking-[0.15em] font-medium space-y-4">

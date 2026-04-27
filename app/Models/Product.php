@@ -15,4 +15,9 @@ class Product extends Model
     {
         return $this->hasMany(Sku::class);
     }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
 }

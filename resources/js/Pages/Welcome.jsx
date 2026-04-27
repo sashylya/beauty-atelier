@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Welcome({ auth, look, hitProducts }) {
+export default function Welcome({ auth, look, hitProducts, latestPosts }) {
     const [activeShade, setActiveShade] = useState(0);
     const sliderRef = useRef(null);
 
@@ -72,7 +72,7 @@ export default function Welcome({ auth, look, hitProducts }) {
                                         <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.9)]"></div>
                                     </div>
                                     <div className="absolute left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
-                                        <span className="bg-white/90 backdrop-blur px-3 py-1 text-[9px] uppercase tracking-widest text-[#5D2E18] shadow-lg border border-[#D4AF37]/20">{h.label}</span>
+                                        <span className="bg-white/90 backdrop-blur px-3 py-1 text-[11px] uppercase tracking-widest text-[#5D2E18] shadow-lg border border-[#D4AF37]/20">{h.label}</span>
                                     </div>
                                     {h.product_slug && <Link href={route('catalog.show', h.product_slug)} className="absolute inset-0 z-10" />}
                                 </div>
@@ -86,7 +86,7 @@ export default function Welcome({ auth, look, hitProducts }) {
                             <div className="w-full max-w-sm space-y-8 mb-12">
                                 {look?.hotspots?.map((h) => (
                                     <Link key={h.id} href={h.product_slug ? route('catalog.show', h.product_slug) : '#'} className="flex justify-between items-center group text-[#5D2E18]">
-                                        <span className="uppercase tracking-[0.25em] text-[11px] font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
+                                        <span className="uppercase tracking-[0.25em] text-[13px] font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
                                         <span className="text-[#D4AF37] opacity-60 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300">
                                             <svg width="40" height="10" viewBox="0 0 40 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 5H39M39 5L34 1M39 5L34 9" stroke="currentColor" strokeWidth="0.5"/></svg>
                                         </span>
@@ -175,22 +175,27 @@ export default function Welcome({ auth, look, hitProducts }) {
                 <div className="max-w-[1400px] mx-auto px-6">
                     <div className="flex justify-between items-end mb-20 border-b border-gray-100 pb-8">
                         <h2 className="font-serif text-5xl text-[#4A4A4A]">Дневник <br/> Ателье</h2>
-                        <a href="#" className="uppercase tracking-[0.2em] text-[10px] font-bold text-gray-400 hover:text-[#8B5A2B] transition mb-2">Подписаться на космо-блог</a>
+                        <Link href={route('blog.index')} className="uppercase tracking-[0.2em] text-[10px] font-bold text-gray-400 hover:text-[#8B5A2B] transition mb-2">Подписаться на космо-блог</Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        {[
-                            { title: "Как подобрать идеальный оттенок помады" },
-                            { title: "Интересные факты о происхождении теней" },
-                            { title: "Чем пользовалась Клеопатра из косметики" }
-                        ].map((post, i) => (
-                            <div key={i} className="group cursor-pointer">
-                                <div className="aspect-square bg-[#FAF9F6] border border-[#3D2B1F]/5 mb-8 overflow-hidden transition-colors group-hover:bg-[#FDF5E6]">
-                                    {/* Место для будущего изображения */}
+                        {latestPosts && latestPosts.map((post) => (
+                            <Link key={post.id} href={route('blog.show', post.slug)} className="group">
+                                <div className="aspect-square bg-[#FAF9F6] border border-[#3D2B1F]/5 mb-8 overflow-hidden relative">
+                                    {post.image_path ? (
+                                        <img 
+                                            src={`/storage/${post.image_path}`} 
+                                            alt={post.title} 
+                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center font-serif italic text-4xl opacity-10 uppercase tracking-widest">BA</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 </div>
                                 <p className="text-center text-[10px] uppercase tracking-[0.15em] text-gray-500 max-w-[200px] mx-auto leading-relaxed group-hover:text-black transition">
                                     {post.title}
                                 </p>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

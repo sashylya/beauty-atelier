@@ -8,18 +8,19 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    //открыть страницу
     public function create(): Response
     {
         return Inertia::render('Auth/Register');
     }
 
+    //валидация
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -36,17 +37,11 @@ class RegisteredUserController extends Controller
             'password.min' => 'Пароль должен содержать минимум 8 символов.',
         ]);
 
-        // Ручная проверка на дубликат для 100% надежности
-        if (User::where('email', $request->email)->exists()) {
-            return back()->withErrors([
-                'email' => 'Этот Email уже зарегистрирован в системе.',
-            ])->withInput();
-        }
-
+        //создаем польз
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
         ]);
 
         event(new Registered($user));

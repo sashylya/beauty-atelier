@@ -1,27 +1,19 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Сначала удалим дубликаты, если они есть, чтобы миграция прошла успешно
-        // (Оставим только одну запись для каждого email)
+        // The base users migration already creates a unique index on email.
+        // Keep only the deduplication step for legacy data.
         DB::statement('DELETE FROM users WHERE id NOT IN (SELECT MIN(id) FROM users GROUP BY email)');
-
-        Schema::table('users', function (Blueprint $table) {
-            // Добавляем уникальный индекс (если его еще нет)
-            $table->unique('email');
-        });
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropUnique(['email']);
-        });
+        // No-op: the unique index belongs to the base users migration.
     }
 };

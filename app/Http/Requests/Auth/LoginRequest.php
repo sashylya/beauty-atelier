@@ -13,17 +13,11 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
@@ -64,6 +58,7 @@ class LoginRequest extends FormRequest
         }
 
         // Дополнительная проверка на блокировку админом
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         if (!$user->is_active) {
             Auth::logout();

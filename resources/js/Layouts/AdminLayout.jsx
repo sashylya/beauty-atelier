@@ -64,7 +64,16 @@ export default function AdminLayout({ children }) {
                      <div className="text-[10px] uppercase tracking-[0.15em] text-[#3D2B1F]/50">
                         {new Date().toLocaleDateString('ru-RU', { weekday: 'long', month: 'long', day: 'numeric' })}
                      </div>
-                     <div className="flex items-center gap-4">
+                     <div className="flex items-center gap-8">
+                        <Link 
+                            href={route('home')} 
+                            className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#3D2B1F]/60 hover:text-[#D4AF37] transition-colors flex items-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                            На сайт
+                        </Link>
                         <div className="w-8 h-8 rounded-full bg-[#3D2B1F] flex items-center justify-center text-[#FDF5E6] font-serif italic text-xs">
                             A
                         </div>

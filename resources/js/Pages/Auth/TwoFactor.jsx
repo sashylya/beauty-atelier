@@ -1,8 +1,9 @@
 import React from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function TwoFactor() {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         code: '',
     });
@@ -20,8 +21,16 @@ export default function TwoFactor() {
                 <div className="auth-card">
                     <h2 className="auth-title">Двухфакторная проверка</h2>
 
+                    {flash.success && <div className="auth-status">{flash.success}</div>}
+                    {flash.info && <div className="auth-status">{flash.info}</div>}
+                    {flash.two_factor_code && (
+                        <div className="auth-status">
+                            Код для входа: <strong>{flash.two_factor_code}</strong>
+                        </div>
+                    )}
+
                     <div className="auth-description text-center">
-                        На ваш Email был отправлен 6-значный код подтверждения. 
+                        На ваш Email был отправлен 6-значный код подтверждения.
                         Пожалуйста, введите его ниже для входа в личный кабинет.
                     </div>
 
@@ -49,7 +58,7 @@ export default function TwoFactor() {
                             >
                                 Подтвердить вход
                             </button>
-                            
+
                             <p className="mt-4 text-xs text-[#8C7A7A]">
                                 Код действителен в течение 10 минут.
                             </p>

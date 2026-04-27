@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
-export default function Catalog({ products, filters }) {
+export default function Catalog({ products, filters, favoriteProductIds }) {
+    const { auth } = usePage().props;
     const [showFilters, setShowFilters] = useState(false);
     
     // Проверка, активен ли хоть один фильтр (кроме категории и дефолтной сортировки)
@@ -62,6 +63,30 @@ export default function Catalog({ products, filters }) {
         if (name === 'sort') {
             applyFilters(updated);
         }
+    };
+
+    const addToCart = (skuId) => {
+        if (!auth.user) {
+            router.get(route('login'));
+            return;
+        }
+        
+        router.post(route('cart.add', skuId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Можно добавить уведомление
+            }
+        });
+    };
+
+    const toggleWishlist = (product) => {
+        if (!auth.user) {
+            router.get(route('login'));
+            return;
+        }
+        
+        const skuId = product.skus && product.skus.length > 0 ? product.skus[0].id : null;
+        router.post(route('wishlist.toggle', product.id), { sku_id: skuId }, { preserveScroll: true });
     };
 
     return (
@@ -198,11 +223,11 @@ export default function Catalog({ products, filters }) {
                     )}
                 </header>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
                     {products.map((product) => (
                         <div key={product.id} className="group">
                             <Link href={route('catalog.show', product.slug)}>
-                                <div className="aspect-[4/5] overflow-hidden bg-[#F0F0F0] mb-8 relative border border-deep-espresso/5 shadow-sm">
+                                <div className="aspect-[4/5] overflow-hidden bg-[#F0F0F0] mb-6 relative border border-deep-espresso/5 shadow-sm">
                                     <div className="w-full h-full flex items-center justify-center transition-transform duration-1000 ease-out group-hover:scale-110">
                                         <div className="absolute inset-0 bg-gradient-to-t from-deep-espresso/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                         {product.image_path ? (
@@ -220,13 +245,32 @@ export default function Catalog({ products, filters }) {
                                             Хит
                                         </div>
                                     )}
+                                    <button 
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            toggleWishlist(product);
+                                        }}
+                                        className="absolute top-6 right-6 z-20 transition-all duration-300 hover:scale-110"
+                                    >
+                                        <svg 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            fill={favoriteProductIds.includes(product.id) ? "#D4AF37" : "none"} 
+                                            viewBox="0 0 24 24" 
+                                            strokeWidth={1.5} 
+                                            stroke={favoriteProductIds.includes(product.id) ? "#D4AF37" : "currentColor"} 
+                                            className={`w-5 h-5 ${favoriteProductIds.includes(product.id) ? '' : 'text-deep-espresso/30 hover:text-champagne-gold'}`}
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                        </svg>
+                                    </button>
                                 </div>
                                 <div className="text-center px-4">
-                                    <h3 className="uppercase tracking-[0.2em] text-[11px] font-bold mb-3 group-hover:text-champagne-gold transition-colors duration-300">{product.name}</h3>
-                                    <p className="font-serif italic text-deep-espresso/50 text-xs mb-4">
+                                    <h3 className="uppercase tracking-[0.2em] text-[11px] font-bold mb-2 group-hover:text-champagne-gold transition-colors duration-300">{product.name}</h3>
+                                    <p className="font-serif italic text-deep-espresso/50 text-xs mb-2">
                                         {product.skus.length > 0 ? `${product.skus.length} Оттенков` : '1 Оттенок'}
                                     </p>
-                                    <p className="uppercase tracking-[0.1em] text-xs font-semibold">
+                                    <p className="uppercase tracking-[0.1em] text-xs font-semibold mb-4">
                                         {product.price 
                                             ? `${parseFloat(product.price).toLocaleString()} ₽` 
                                             : (product.skus.length > 0 
@@ -236,6 +280,16 @@ export default function Catalog({ products, filters }) {
                                     </p>
                                 </div>
                             </Link>
+                            {product.skus && product.skus.length > 0 && (
+                                <div className="px-4 mt-2">
+                                    <button 
+                                        onClick={() => addToCart(product.skus[0].id)}
+                                        className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
+                                    >
+                                        В корзину
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

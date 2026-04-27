@@ -70,6 +70,7 @@ class ProductController extends Controller
         return Inertia::render('Catalog', [
             'products' => $products,
             'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
+            'favoriteProductIds' => $request->user() ? $request->user()->favoriteProducts()->pluck('products.id')->toArray() : [],
         ]);
     }
 
@@ -79,6 +80,7 @@ class ProductController extends Controller
 
         return Inertia::render('Product/Show', [
             'product' => $product,
+            'favoriteSkuIds' => auth()->user() ? auth()->user()->favoriteProducts()->pluck('sku_id')->toArray() : [],
         ]);
     }
 }
