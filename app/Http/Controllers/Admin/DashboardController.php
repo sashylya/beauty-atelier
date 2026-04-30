@@ -14,22 +14,25 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Basic Stats
-        $totalOrders = Order::count();
-        $totalRevenue = Order::sum('total_amount');
+        // Basic Stats - Exclude cancelled orders
+        $totalOrders = Order::where('status', '!=', Order::STATUS_CANCELLED)->count();
+        // Revenue typically counts only successful payments
+        $totalRevenue = Order::whereIn('status', [Order::STATUS_PAID, Order::STATUS_SHIPPED, Order::STATUS_COMPLETED])->sum('total_amount');
         $totalUsers = User::count();
         $totalBookings = Booking::count();
 
         // Data for Charts
-        // Orders per day for the last 7 days
+        // Orders per day for the last 7 days (Excluding cancelled)
         $ordersLast7Days = Order::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->where('status', '!=', Order::STATUS_CANCELLED)
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
-        // Revenue per day for the last 7 days
+        // Revenue per day for the last 7 days (Only paid/shipped/completed)
         $revenueLast7Days = Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
+            ->whereIn('status', [Order::STATUS_PAID, Order::STATUS_SHIPPED, Order::STATUS_COMPLETED])
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')

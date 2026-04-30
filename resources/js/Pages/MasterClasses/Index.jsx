@@ -56,7 +56,9 @@ export default function Index({ masterClasses }) {
                                             </div>
                                             <div>
                                                 <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Наличие мест</p>
-                                                <p className="text-[11px] uppercase tracking-widest font-bold text-champagne-gold">{mc.capacity} Мест</p>
+                                                <p className="text-[11px] uppercase tracking-widest font-bold text-champagne-gold">
+                                                    {mc.available_seats > 0 ? `${mc.available_seats} Мест` : 'Нет мест'}
+                                                </p>
                                             </div>
                                         </div>
 

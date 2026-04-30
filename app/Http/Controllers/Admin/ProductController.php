@@ -40,7 +40,6 @@ class ProductController extends Controller
             'category' => 'required|string|max:50',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_hit' => 'boolean',
             'is_look_of_month' => 'boolean',
         ]);
 
@@ -83,7 +82,6 @@ class ProductController extends Controller
             'category' => 'required|string|max:50',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_hit' => 'boolean',
             'is_look_of_month' => 'boolean',
         ]);
 

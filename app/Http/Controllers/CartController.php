@@ -57,9 +57,20 @@ class CartController extends Controller
     public function add(Request $request, Sku $sku)
     {
         $cart = $request->session()->get('cart', []);
-        if (isset($cart[$sku->id])) { $cart[$sku->id]++; } else { $cart[$sku->id] = 1; }
+        $currentQuantity = isset($cart[$sku->id]) ? $cart[$sku->id] : 0;
+        
+        if ($sku->stock < ($currentQuantity + 1)) {
+            return redirect()->back()->with('error', 'К сожалению, больше нет в наличии.');
+        }
+
+        if (isset($cart[$sku->id])) { 
+            $cart[$sku->id]++; 
+        } else { 
+            $cart[$sku->id] = 1; 
+        }
+        
         $request->session()->put('cart', $cart);
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Товар добавлен в корзину');
     }
 
     public function remove(Request $request, Sku $sku)
@@ -73,6 +84,11 @@ class CartController extends Controller
     public function updateQuantity(Request $request, Sku $sku)
     {
         $request->validate(['quantity' => 'required|integer|min:1|max:99']);
+        
+        if ($sku->stock < $request->quantity) {
+            return redirect()->back()->with('error', "В наличии только {$sku->stock} шт.");
+        }
+
         $cart = $request->session()->get('cart', []);
         if (isset($cart[$sku->id])) {
             $cart[$sku->id] = $request->quantity;

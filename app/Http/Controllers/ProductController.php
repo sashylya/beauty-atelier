@@ -19,7 +19,49 @@ class ProductController extends Controller
 
         // Поиск
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $searchTerm = $request->search;
+            $words = explode(' ', $searchTerm);
+            
+            $query->where(function($q) use ($words) {
+                foreach ($words as $word) {
+                    $word = trim($word);
+                    if (empty($word)) continue;
+                    
+                    $q->where(function($sq) use ($word) {
+                        $sq->where('name', 'like', '%' . $word . '%')
+                          ->orWhere('description', 'like', '%' . $word . '%')
+                          ->orWhere('category', 'like', '%' . $word . '%');
+                    });
+                }
+            });
+
+            // Если результатов по LIKE не найдено, попробуем "нечеткий" поиск (typo tolerance)
+            if ($query->count() === 0) {
+                $allProducts = Product::with('skus')->get();
+                $fuzzyResults = $allProducts->filter(function($product) use ($searchTerm) {
+                    $name = mb_strtolower($product->name);
+                    $search = mb_strtolower($searchTerm);
+                    
+                    // Проверяем расстояние Левенштейна для всего названия
+                    if (levenshtein($name, $search) <= 2) return true;
+                    
+                    // Или для каждого слова в названии
+                    foreach (explode(' ', $name) as $productWord) {
+                        if (levenshtein($productWord, $search) <= 1) return true;
+                    }
+                    
+                    return false;
+                });
+
+                if ($fuzzyResults->isNotEmpty()) {
+                    return Inertia::render('Catalog', [
+                        'products' => $fuzzyResults->values(),
+                        'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
+                        'favoriteProductIds' => $request->user() ? $request->user()->favoriteProducts()->pluck('products.id')->toArray() : [],
+                        'isFuzzy' => true,
+                    ]);
+                }
+            }
         }
 
         // Фильтр по цене (минимальная и максимальная)
@@ -80,7 +122,7 @@ class ProductController extends Controller
 
         return Inertia::render('Product/Show', [
             'product' => $product,
-            'favoriteSkuIds' => auth()->user() ? auth()->user()->favoriteProducts()->pluck('sku_id')->toArray() : [],
+            'favoriteSkuIds' => auth()->user() ? auth()->user()->favoriteSkus()->pluck('skus.id')->toArray() : [],
         ]);
     }
 }

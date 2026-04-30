@@ -37,6 +37,7 @@ class User extends Authenticatable
         'is_cosmetologist',
         'specialization',
         'biography',
+        'avatar',
         'is_active',
         'blocked_at',
         'last_login_at',
@@ -115,5 +116,10 @@ class User extends Authenticatable
     public function favoriteProducts()
     {
         return $this->belongsToMany(Product::class, 'favorites')->withTimestamps();
+    }
+
+    public function favoriteSkus()
+    {
+        return $this->belongsToMany(Sku::class, 'favorites')->withTimestamps();
     }
 }

@@ -133,34 +133,48 @@ export default function Edit({ look, products }) {
                         <h2 className="text-[10px] uppercase tracking-[0.3em] font-black mb-6 opacity-30">Активные точки ({hotspots.length})</h2>
                         <div className="space-y-6">
                             {hotspots.map((h, index) => (
-                                <div key={h.id} className="p-4 bg-[#FDF5E6]/50 border border-[#3D2B1F]/5 relative group">
+                                <div key={h.id} className="p-6 bg-[#FDF5E6]/30 border border-[#3D2B1F]/5 relative group transition-all hover:bg-[#FDF5E6]/60">
                                     <button 
                                         type="button"
                                         onClick={() => removeHotspot(h.id)}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute -top-2 -right-2 bg-red-800 text-white w-6 h-6 rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition-all shadow-lg flex items-center justify-center hover:scale-110 z-10"
                                     >✕</button>
                                     
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-[8px] uppercase tracking-widest font-bold mb-1">Координаты</label>
-                                            <div className="text-[10px] text-gray-400 font-mono">X: {h.x}% | Y: {h.y}%</div>
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex justify-between items-center border-b border-[#3D2B1F]/5 pb-3">
+                                            <span className="text-[10px] uppercase tracking-[0.3em] font-black text-[#D4AF37]">Точка {index + 1}</span>
                                         </div>
+                                        
                                         <div>
-                                            <label className="block text-[8px] uppercase tracking-widest font-bold mb-1">Товар</label>
+                                            <label className="block text-[8px] uppercase tracking-[0.3em] font-bold mb-2 text-[#3D2B1F]/40">Выберите товар из каталога</label>
                                             <select 
                                                 value={h.product_id}
                                                 onChange={e => updateHotspot(h.id, 'product_id', e.target.value)}
-                                                className="w-full border-[#3D2B1F]/10 p-1 text-[10px] focus:ring-0"
+                                                className="w-full border-[#3D2B1F]/10 bg-white p-3 text-[11px] font-bold uppercase tracking-widest focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all"
                                             >
-                                                {products.map(p => (
-                                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                                ))}
+                                                <option value="" disabled>— Выберите продукт —</option>
+                                                {/* Group by category for convenience */}
+                                                {['face', 'eyes', 'lips', 'tools'].map(cat => {
+                                                    const catProducts = products.filter(p => p.category === cat);
+                                                    if (catProducts.length === 0) return null;
+                                                    return (
+                                                        <optgroup key={cat} label={cat === 'face' ? 'ЛИЦО' : cat === 'eyes' ? 'ГЛАЗА' : cat === 'lips' ? 'ГУБЫ' : 'ИНСТРУМЕНТЫ'}>
+                                                            {catProducts.map(p => (
+                                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    );
+                                                })}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {hotspots.length === 0 && <p className="text-xs text-center text-gray-400 italic">Нажмите на фото, чтобы добавить точку</p>}
+                            {hotspots.length === 0 && (
+                                <div className="py-12 text-center border-2 border-dashed border-[#3D2B1F]/5">
+                                    <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">Нажмите на фото модели,<br/>чтобы добавить точку</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 

@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Dashboard({ auth, orders, bookings }) {
+    const { flash } = usePage().props;
+
+    useEffect(() => {
+        if (flash.error) {
+            alert(flash.error);
+        }
+    }, [flash.error]);
+
     return (
         <BeautyLayout>
             <Head title="Личный Кабинет — Beauty Atelier" />
@@ -63,9 +71,30 @@ export default function Dashboard({ auth, orders, bookings }) {
                                             <div>
                                                 <p className="text-[10px] uppercase tracking-widest opacity-60 mb-1">Локация</p>
                                                 <p className="font-serif italic text-sm">{booking.master_class.location}</p>
+                                                <div className="mt-4 flex gap-4">
+                                                    {booking.status === 'pending' && (
+                                                        <Link 
+                                                            href={route('bookings.cancel', booking.id)} 
+                                                            method="post"
+                                                            as="button"
+                                                            onBefore={() => confirm('Отменить бронирование?')}
+                                                            className="text-[9px] uppercase tracking-widest font-bold text-red-800/40 hover:text-red-800 transition"
+                                                        >
+                                                            Отменить
+                                                        </Link>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <span className="inline-block px-3 py-1 bg-green-50 text-green-800 text-[9px] uppercase tracking-widest font-bold">
-                                                Подтверждено
+                                            <span className={`inline-block px-3 py-1 text-[9px] uppercase tracking-widest font-bold ${
+                                                booking.status === 'paid' ? 'bg-green-50 text-green-800' : 
+                                                booking.status === 'confirmed' ? 'bg-blue-50 text-blue-800' : 
+                                                booking.status === 'cancelled' ? 'bg-red-50 text-red-800' : 
+                                                'bg-creamy-silk text-deep-espresso/60'
+                                            }`}>
+                                                {booking.status === 'pending' ? 'Ожидает оплаты' : 
+                                                 booking.status === 'paid' ? 'Оплачено' : 
+                                                 booking.status === 'confirmed' ? 'Подтверждено' : 
+                                                 booking.status === 'cancelled' ? 'Отменено' : booking.status}
                                             </span>
                                         </div>
                                     </div>
@@ -95,27 +124,51 @@ export default function Dashboard({ auth, orders, bookings }) {
                                                 <span className="uppercase tracking-[0.2em] text-[10px] font-bold mr-4">Заказ #{order.id}</span>
                                                 <span className="text-xs text-deep-espresso/40">{new Date(order.created_at).toLocaleDateString('ru-RU')}</span>
                                             </div>
-                                            <span className="text-[10px] uppercase tracking-widest font-bold text-deep-espresso/60">{order.status || 'Обработка'}</span>
+                                            <span className={`text-[10px] uppercase tracking-widest font-bold ${
+                                                order.status === 'paid' ? 'text-green-600' : 
+                                                order.status === 'cancelled' ? 'text-red-400' : 'text-deep-espresso/60'
+                                            }`}>
+                                                {order.status === 'new' ? 'Ожидает оплаты' : 
+                                                 order.status === 'paid' ? 'Оплачено' : 
+                                                 order.status === 'shipped' ? 'Отправлено' : 
+                                                 order.status === 'completed' ? 'Завершено' : 
+                                                 order.status === 'cancelled' ? 'Отменено' : order.status}
+                                            </span>
                                         </div>
 
                                         <div className="space-y-4 mb-6">
                                             {order.items.map((item) => (
                                                 <div key={item.id} className="flex justify-between items-center">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-8 h-8 rounded-full border border-deep-espresso/10" style={{ backgroundColor: item.sku.color_hex }}></div>
+                                                    <Link href={route('catalog.show', item.sku.product.slug)} className="flex items-center gap-4 group">
+                                                        <div className="w-8 h-8 rounded-full border border-deep-espresso/10 transition-transform group-hover:scale-110" style={{ backgroundColor: item.sku.color_hex }}></div>
                                                         <div>
-                                                            <p className="text-sm font-serif italic">{item.sku.product.name}</p>
+                                                            <p className="text-sm font-serif italic group-hover:text-champagne-gold transition-colors">{item.sku.product.name}</p>
                                                             <p className="text-[10px] uppercase tracking-widest opacity-40">{item.sku.shade_name}</p>
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                     <span className="text-xs opacity-60">x{item.quantity}</span>
                                                 </div>
                                             ))}
                                         </div>
 
                                         <div className="flex justify-between items-center pt-4 border-t border-deep-espresso/5">
-                                            <span className="uppercase tracking-[0.2em] text-[9px] font-bold opacity-60">Итого</span>
-                                            <span className="font-serif italic text-lg">{order.total_amount?.toLocaleString() ?? '—'} ₽</span>
+                                            <div>
+                                                {order.status === 'new' && (
+                                                    <Link 
+                                                        href={route('orders.cancel', order.id)} 
+                                                        method="post"
+                                                        as="button"
+                                                        onBefore={() => confirm('Вы уверены, что хотите отменить этот заказ? Товары вернутся в каталог.')}
+                                                        className="text-[9px] uppercase tracking-[0.2em] font-bold text-red-800/40 hover:text-red-800 transition"
+                                                    >
+                                                        Отменить заказ
+                                                    </Link>
+                                                )}
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="uppercase tracking-[0.2em] text-[9px] font-bold opacity-60 mr-4">Итого</span>
+                                                <span className="font-serif italic text-lg">{order.total_amount?.toLocaleString() ?? '—'} ₽</span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

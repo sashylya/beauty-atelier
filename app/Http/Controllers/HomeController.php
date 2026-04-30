@@ -28,10 +28,10 @@ class HomeController extends Controller
             })->toArray();
         }
 
-        // 2. Загружаем Хиты продаж (до 10 шт для слайдера)
-        $hitProducts = Product::where('is_hit', true)
+        // 2. Загружаем Хиты продаж (автоматически по количеству заказов)
+        $hitProducts = Product::withSum('orderItems', 'quantity')
+            ->orderBy('order_items_sum_quantity', 'desc')
             ->with('skus')
-            ->latest()
             ->take(10)
             ->get();
 

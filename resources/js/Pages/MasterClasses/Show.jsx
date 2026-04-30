@@ -10,8 +10,8 @@ export default function Show({ masterClass, auth }) {
     const submit = (e) => {
         e.preventDefault();
         post(route('master-classes.book', masterClass.id), {
+            preserveScroll: true,
             onSuccess: () => {
-                alert('Бронирование подтверждено. Добро пожаловать в Ателье.');
                 reset();
             },
         });
@@ -50,7 +50,17 @@ export default function Show({ masterClass, auth }) {
                                 </div>
                                 <div>
                                     <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30 mb-2">Цена</p>
-                                    <p className="font-serif italic text-xl">{masterClass.price.toLocaleString()} ₽</p>
+                                    <p className="font-serif italic text-xl">{parseFloat(masterClass.price).toLocaleString()} ₽</p>
+                                </div>
+                                <div>
+                                    <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30 mb-2">Места</p>
+                                    <p className="font-serif italic text-xl">
+                                        {masterClass.available_seats > 0 ? (
+                                            `${masterClass.available_seats} из ${masterClass.capacity}`
+                                        ) : (
+                                            <span className="text-red-800 uppercase text-xs tracking-widest font-bold">Нет мест</span>
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -107,8 +117,9 @@ export default function Show({ masterClass, auth }) {
                                         />
                                         <button 
                                             type="button"
-                                            onClick={() => setData('tickets', data.tickets + 1)}
-                                            className="w-12 h-12 flex items-center justify-center hover:bg-creamy-silk transition"
+                                            onClick={() => setData('tickets', Math.min(masterClass.available_seats, data.tickets + 1))}
+                                            className="w-12 h-12 flex items-center justify-center hover:bg-creamy-silk transition disabled:opacity-20"
+                                            disabled={data.tickets >= masterClass.available_seats}
                                         >
                                             +
                                         </button>
@@ -124,10 +135,10 @@ export default function Show({ masterClass, auth }) {
                                 {auth.user ? (
                                     <button 
                                         type="submit"
-                                        disabled={processing}
-                                        className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-champagne-gold transition-all duration-500"
+                                        disabled={processing || masterClass.available_seats <= 0}
+                                        className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-champagne-gold transition-all duration-500 disabled:bg-gray-200 disabled:text-gray-400"
                                     >
-                                        {processing ? 'Обработка...' : 'Подтвердить бронь'}
+                                        {masterClass.available_seats <= 0 ? 'Нет мест' : (processing ? 'Обработка...' : 'Оплатить и забронировать')}
                                     </button>
                                 ) : (
                                     <Link 

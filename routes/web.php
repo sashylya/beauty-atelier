@@ -24,6 +24,9 @@ Route::get('/master-classes/{masterClass}', [MasterClassController::class, 'show
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
+Route::post('/orders/webhook', [\App\Http\Controllers\OrderController::class, 'webhook'])->name('orders.webhook');
+Route::post('/bookings/webhook', [\App\Http\Controllers\BookingController::class, 'webhook'])->name('bookings.webhook');
+
 Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
@@ -46,11 +49,21 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/cart/update/{sku}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::post('/cart/toggle-packaging', [CartController::class, 'togglePackaging'])->name('cart.toggle-packaging');
 
+    // Заказы
+    Route::get('/checkout', [\App\Http\Controllers\OrderController::class, 'checkout'])->name('checkout.index');
+    Route::post('/orders', [\App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}/success', [\App\Http\Controllers\OrderController::class, 'success'])->name('orders.success');
+    Route::post('/orders/{order}/pay', [\App\Http\Controllers\OrderController::class, 'pay'])->name('orders.pay');
+    Route::post('/orders/{order}/cancel', [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
+
     // Избранное
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     Route::post('/master-classes/{masterClass}/book', [BookingController::class, 'store'])->name('master-classes.book');
+    Route::post('/bookings/{booking}/pay', [BookingController::class, 'pay'])->name('bookings.pay');
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/2fa', [ProfileController::class, 'updateTwoFactor'])->name('profile.update-2fa');
@@ -74,6 +87,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('master-classes', \App\Http\Controllers\Admin\MasterClassController::class);
     Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
     Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+    Route::patch('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'destroy'])->name('bookings.destroy');
 
     // Управление пользователями

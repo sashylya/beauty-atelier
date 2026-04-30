@@ -18,6 +18,17 @@ class BookingController extends Controller
         ]);
     }
 
+    public function update(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,paid,confirmed,cancelled',
+        ]);
+
+        $booking->update($validated);
+
+        return redirect()->back()->with('success', 'Статус бронирования обновлен.');
+    }
+
     public function destroy(Booking $booking)
     {
         $booking->delete();

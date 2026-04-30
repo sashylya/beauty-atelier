@@ -16,11 +16,21 @@ class BlogController extends Controller
             $query->where('category', $request->category);
         }
 
+        if ($request->filled('author_id')) {
+            $query->where('user_id', $request->author_id);
+        }
+
         $posts = $query->latest('published_at')->paginate(6)->withQueryString();
+
+        $cosmetologists = \App\Models\User::where('is_cosmetologist', true)
+            ->where('is_active', true)
+            ->take(4)
+            ->get();
 
         return Inertia::render('Blog/Index', [
             'posts' => $posts,
             'filters' => $request->all(['category']),
+            'cosmetologists' => $cosmetologists,
         ]);
     }
 

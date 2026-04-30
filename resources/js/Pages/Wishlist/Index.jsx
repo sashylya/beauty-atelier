@@ -1,10 +1,23 @@
 import React from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function Index({ favoriteSkus }) {
+    const { auth } = usePage().props;
+
     const removeFavorite = (productId, skuId) => {
         router.post(route('wishlist.toggle', productId), { sku_id: skuId }, { preserveScroll: true });
+    };
+
+    const addToCart = (skuId) => {
+        if (!auth.user) {
+            router.get(route('login'));
+            return;
+        }
+        
+        router.post(route('cart.add', skuId), {}, {
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -21,7 +34,7 @@ export default function Index({ favoriteSkus }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
                         {favoriteSkus.map((sku) => (
                             <div key={sku.id} className="group relative">
-                                <Link href={route('catalog.show', sku.product.slug)}>
+                                <Link href={route('catalog.show', sku.product.slug)} className="block">
                                     <div className="aspect-[4/5] overflow-hidden bg-[#F0F0F0] mb-6 relative border border-deep-espresso/5 shadow-sm">
                                         <div className="w-full h-full flex items-center justify-center transition-transform duration-1000 ease-out group-hover:scale-110">
                                             {sku.image_url ? (
@@ -65,12 +78,12 @@ export default function Index({ favoriteSkus }) {
                                     </div>
                                 </Link>
                                 <div className="px-4">
-                                    <Link 
-                                        href={route('catalog.show', sku.product.slug)}
+                                    <button 
+                                        onClick={() => addToCart(sku.id)}
                                         className="block w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold text-center hover:bg-black transition-all"
                                     >
-                                        Купить этот оттенок
-                                    </Link>
+                                        Добавить в корзину
+                                    </button>
                                 </div>
                             </div>
                         ))}

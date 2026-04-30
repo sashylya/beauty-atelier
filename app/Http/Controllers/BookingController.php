@@ -6,25 +6,124 @@ use App\Models\MasterClass;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class BookingController extends Controller
 {
     public function store(Request $request, MasterClass $masterClass)
     {
         $request->validate([
-            'tickets' => 'required|integer|min:1|max:' . ($masterClass->capacity - $masterClass->bookings()->count()),
+            'tickets' => 'required|integer|min:1',
         ]);
 
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('message', 'Please login to book a master class.');
+        if (!$masterClass->hasAvailableSeats($request->tickets)) {
+            return redirect()->back()->with('error', 'К сожалению, мест больше нет.');
         }
+
+        $totalPrice = $masterClass->price * $request->tickets;
 
         $booking = $masterClass->bookings()->create([
             'user_id' => Auth::id(),
             'tickets_count' => $request->tickets,
-            'status' => 'confirmed', // In real app, might wait for payment
+            'total_price' => $totalPrice,
+            'status' => Booking::STATUS_PENDING,
         ]);
 
-        return redirect()->back()->with('success', 'Master class booked successfully!');
+        return $this->processPayment($booking);
+    }
+
+    public function pay(Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($booking->status !== Booking::STATUS_PENDING) {
+            return redirect()->back()->with('error', 'Это бронирование нельзя оплатить.');
+        }
+
+        return $this->processPayment($booking);
+    }
+
+    private function processPayment(Booking $booking)
+    {
+        $shopId = config('services.yookassa.shop_id');
+        $secretKey = config('services.yookassa.secret_key');
+
+        if (!$shopId || !$secretKey) {
+            return redirect()->route('dashboard')->with('success', 'Место забронировано, но оплата временно недоступна.');
+        }
+
+        $response = Http::withBasicAuth($shopId, $secretKey)
+            ->withoutVerifying()
+            ->withHeaders(['Idempotence-Key' => Str::random(64)])
+            ->post('https://api.yookassa.ru/v3/payments', [
+                'amount' => [
+                    'value' => number_format($booking->total_price, 2, '.', ''),
+                    'currency' => 'RUB',
+                ],
+                'confirmation' => [
+                    'type' => 'redirect',
+                    'return_url' => route('dashboard'), // Вернем в кабинет
+                ],
+                'capture' => true,
+                'description' => "Оплата мастер-класса: {$booking->masterClass->title}",
+                'metadata' => [
+                    'booking_id' => $booking->id,
+                ],
+            ]);
+
+        if ($response->successful()) {
+            $payment = $response->json();
+            $booking->update([
+                'payment_id' => $payment['id'],
+                'payment_url' => $payment['confirmation']['confirmation_url'],
+            ]);
+
+            return Inertia::location($payment['confirmation']['confirmation_url']);
+        }
+
+        Log::error('YooKassa Booking Error: ' . $response->body());
+        return redirect()->route('dashboard')->with('error', 'Ошибка при создании платежа.');
+    }
+
+    public function cancel(Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($booking->status === Booking::STATUS_PAID) {
+            return redirect()->back()->with('error', 'Оплаченное бронирование нельзя отменить самостоятельно.');
+        }
+
+        $booking->update(['status' => Booking::STATUS_CANCELLED]);
+
+        return redirect()->back()->with('success', 'Бронирование отменено.');
+    }
+
+    public function webhook(Request $request)
+    {
+        $source = $request->all();
+        
+        if ($source['event'] === 'payment.succeeded') {
+            $payment = $source['object'];
+            $bookingId = $payment['metadata']['booking_id'] ?? null;
+            
+            if ($bookingId) {
+                $booking = Booking::find($bookingId);
+                if ($booking && $booking->status !== Booking::STATUS_PAID) {
+                    $booking->update([
+                        'status' => Booking::STATUS_PAID,
+                        'paid_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        return response('OK', 200);
     }
 }

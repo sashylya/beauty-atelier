@@ -37,18 +37,25 @@ export default function Cart({ items, subtotal, total, packagingPrice, isPackagi
                         <div className="lg:col-span-8 space-y-12">
                             {items.map((item) => (
                                 <div key={item.sku.id} className="flex gap-8 pb-12 border-b border-deep-espresso/5">
-                                    <div className="w-32 h-40 bg-white flex items-center justify-center overflow-hidden border border-deep-espresso/5">
-                                        {item.sku.image_url ? (
-                                            <img src={`/storage/${item.sku.image_url}`} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <img src={`/storage/${item.sku.product.image_path}`} alt="" className="w-full h-full object-cover" />
-                                        )}
-                                    </div>
+                                    <Link href={route('catalog.show', item.sku.product.slug)} className="block w-32 h-40 flex-shrink-0">
+                                        <div className="w-full h-full bg-white flex items-center justify-center overflow-hidden border border-deep-espresso/5 transition-transform hover:scale-105 duration-500">
+                                            {item.sku.image_url ? (
+                                                <img src={`/storage/${item.sku.image_url}`} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <img src={`/storage/${item.sku.product.image_path}`} alt="" className="w-full h-full object-cover" />
+                                            )}
+                                        </div>
+                                    </Link>
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-2">{item.sku.product.name}</h3>
+                                                <Link href={route('catalog.show', item.sku.product.slug)} className="block group">
+                                                    <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-2 group-hover:text-champagne-gold transition-colors">{item.sku.product.name}</h3>
+                                                </Link>
                                                 <p className="font-serif italic text-sm text-deep-espresso/60">{item.sku.shade_name}</p>
+                                                {item.sku.stock <= 0 && (
+                                                    <p className="text-[10px] uppercase tracking-widest font-bold text-red-800 mt-2">Нет в наличии</p>
+                                                )}
                                             </div>
                                             <span className="font-light">{(item.sku.price * item.quantity).toLocaleString()} ₽</span>
                                         </div>
@@ -115,9 +122,17 @@ export default function Cart({ items, subtotal, total, packagingPrice, isPackagi
                                     <span className="text-3xl font-light">{total.toLocaleString()} ₽</span>
                                 </div>
                             </div>
-                            <button className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-xl">
-                                Перейти к оформлению
-                            </button>
+                            <Link 
+                                href={items.some(item => item.sku.stock <= 0) ? '#' : route('checkout.index')}
+                                className={`block w-full py-6 uppercase tracking-[0.4em] text-[11px] font-bold transition-all duration-500 shadow-xl text-center ${
+                                    items.some(item => item.sku.stock <= 0) 
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                                    : 'bg-deep-espresso text-creamy-silk hover:bg-black'
+                                }`}
+                                onClick={(e) => items.some(item => item.sku.stock <= 0) && e.preventDefault()}
+                            >
+                                {items.some(item => item.sku.stock <= 0) ? 'Удалите отсутствующие товары' : 'Перейти к оформлению'}
+                            </Link>
                         </div>
                     </div>
                 ) : (

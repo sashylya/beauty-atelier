@@ -10,7 +10,7 @@ class MasterClassController extends Controller
 {
     public function index()
     {
-        $masterClasses = MasterClass::orderBy('date_time')->get();
+        $masterClasses = MasterClass::orderBy('date_time')->get()->each->append('available_seats');
 
         return Inertia::render('MasterClasses/Index', [
             'masterClasses' => $masterClasses,
@@ -20,7 +20,7 @@ class MasterClassController extends Controller
     public function show(MasterClass $masterClass)
     {
         return Inertia::render('MasterClasses/Show', [
-            'masterClass' => $masterClass,
+            'masterClass' => $masterClass->append('available_seats'),
         ]);
     }
 }

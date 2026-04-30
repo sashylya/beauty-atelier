@@ -15,4 +15,9 @@ class Sku extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
 }

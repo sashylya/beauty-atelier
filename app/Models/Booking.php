@@ -11,6 +11,15 @@ class Booking extends Model
 
     protected $guarded = [];
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_PAID = 'paid';
+    const STATUS_CONFIRMED = 'confirmed';
+    const STATUS_CANCELLED = 'cancelled';
+
+    protected $casts = [
+        'paid_at' => 'datetime',
+    ];
+
     protected static function boot()
     {
         parent::boot();

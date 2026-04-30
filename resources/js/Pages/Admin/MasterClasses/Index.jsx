@@ -1,6 +1,6 @@
 import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 
 export default function Index({ masterClasses, bookings }) {
     const { delete: destroy } = useForm();
@@ -9,6 +9,10 @@ export default function Index({ masterClasses, bookings }) {
         if (confirm('Вы уверены, что хотите удалить этот мастер-класс?')) {
             destroy(route('admin.master-classes.destroy', id));
         }
+    };
+
+    const handleStatusChange = (id, status) => {
+        router.patch(route('admin.bookings.update', id), { status });
     };
 
     const handleDeleteBooking = (id) => {
@@ -96,6 +100,7 @@ export default function Index({ masterClasses, bookings }) {
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Мастер-класс</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Гостей</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Сумма</th>
+                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Статус</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center w-24">Действия</th>
                         </tr>
                     </thead>
@@ -122,6 +127,22 @@ export default function Index({ masterClasses, bookings }) {
                                     {(Number(booking.tickets_count) * Number(booking.master_class?.price || 0)).toLocaleString()} ₽
                                 </td>
                                 <td className="py-4 px-6 text-center">
+                                    <select 
+                                        value={booking.status}
+                                        onChange={(e) => handleStatusChange(booking.id, e.target.value)}
+                                        className={`text-[9px] uppercase tracking-widest font-bold border-0 bg-transparent focus:ring-0 cursor-pointer ${
+                                            booking.status === 'paid' ? 'text-green-600' : 
+                                            booking.status === 'cancelled' ? 'text-red-500' :
+                                            booking.status === 'confirmed' ? 'text-blue-500' : 'text-orange-400'
+                                        }`}
+                                    >
+                                        <option value="pending">Ожидает оплаты</option>
+                                        <option value="paid">Оплачено</option>
+                                        <option value="confirmed">Подтверждено</option>
+                                        <option value="cancelled">Отменено</option>
+                                    </select>
+                                </td>
+                                <td className="py-4 px-6 text-center">
                                     <button 
                                         onClick={() => handleDeleteBooking(booking.id)} 
                                         className="text-[#3D2B1F] hover:text-red-500 transition-colors opacity-40 group-hover:opacity-100" 
@@ -135,7 +156,7 @@ export default function Index({ masterClasses, bookings }) {
                         ))}
                         {bookings.length === 0 && (
                             <tr>
-                                <td colSpan="6" className="py-20 text-center text-[#3D2B1F]/30 italic font-serif">
+                                <td colSpan="7" className="py-20 text-center text-[#3D2B1F]/30 italic font-serif">
                                     Записей на мастер-классы пока нет
                                 </td>
                             </tr>

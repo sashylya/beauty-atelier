@@ -41,7 +41,6 @@ export default function Index({ products }) {
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Название</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Категория</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Цена</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Хит</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Образ месяца</th>
                             <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Действия</th>
                         </tr>
@@ -71,13 +70,6 @@ export default function Index({ products }) {
                                 </td>
                                 <td className="py-4 px-6 text-center font-serif italic text-[#3D2B1F]">
                                     {product.price ? `${Number(product.price).toLocaleString()} ₽` : '—'}
-                                </td>
-                                <td className="py-4 px-6 text-center">
-                                    {product.is_hit ? (
-                                        <span className="text-[#D4AF37] text-[10px] uppercase tracking-widest font-bold">Да</span>
-                                    ) : (
-                                        <span className="text-gray-300 text-[10px]">Нет</span>
-                                    )}
                                 </td>
                                 <td className="py-4 px-6 text-center">
                                     {product.is_look_of_month ? (

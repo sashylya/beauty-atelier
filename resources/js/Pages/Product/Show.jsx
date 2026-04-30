@@ -110,6 +110,16 @@ export default function Show({ product, favoriteSkuIds }) {
 
                     {/* Right: Details */}
                     <div className="lg:col-span-5 lg:sticky lg:top-40">
+                        <Link 
+                            href={route('catalog.index')}
+                            className="inline-flex items-center gap-2 uppercase tracking-[0.3em] text-[10px] font-bold text-deep-espresso/40 hover:text-champagne-gold transition mb-12 group"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                            </svg>
+                            Назад в каталог
+                        </Link>
+
                         <div className="mb-12">
                             <nav className="flex space-x-4 uppercase tracking-[0.3em] text-[8px] font-bold text-deep-espresso/40 mb-8">
                                 <Link href={route('catalog.index')} className="hover:text-deep-espresso transition">Коллекция</Link>
@@ -164,10 +174,14 @@ export default function Show({ product, favoriteSkuIds }) {
                         <div className="flex gap-4 mb-4">
                             <button 
                                 onClick={addToCart}
-                                disabled={processing || (product.skus.length === 0 && !product.price)}
-                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50"
+                                disabled={processing || (product.skus.length === 0 && !product.price) || (selectedSku.id && selectedSku.stock <= 0)}
+                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {product.skus.length === 0 && !product.price ? 'Скоро в продаже' : (processing ? 'Добавляем...' : 'Добавить в корзину')}
+                                {product.skus.length === 0 && !product.price 
+                                    ? 'Скоро в продаже' 
+                                    : (selectedSku.id && selectedSku.stock <= 0 
+                                        ? 'Нет в наличии' 
+                                        : (processing ? 'Добавляем...' : 'Добавить в корзину'))}
                             </button>
                             
                             <button 

@@ -10,7 +10,6 @@ export default function Create() {
         category: 'face',
         price: '',
         image: null,
-        is_hit: false,
         is_look_of_month: false,
     });
 
@@ -127,16 +126,6 @@ export default function Create() {
                     </div>
 
                     <div className="flex gap-10 pt-4 border-t border-[#3D2B1F]/10">
-                        <label className="flex items-center cursor-pointer group">
-                            <input
-                                type="checkbox"
-                                checked={data.is_hit}
-                                onChange={(e) => setData('is_hit', e.target.checked)}
-                                className="form-checkbox h-5 w-5 text-[#8B5A2B] border-[#3D2B1F]/20 focus:ring-0"
-                            />
-                            <span className="ml-3 text-[#3D2B1F] text-sm group-hover:text-[#8B5A2B] transition-colors font-medium">Хит продаж?</span>
-                        </label>
-
                          <label className="flex items-center cursor-pointer group">
                             <input
                                 type="checkbox"

@@ -98,7 +98,17 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
                     <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-12">
                         <div>
                             <p className="uppercase tracking-[0.3em] text-[10px] font-semibold text-champagne-gold mb-4">Наши основы</p>
-                            <h1 className="font-serif italic text-6xl text-deep-espresso">Коллекция</h1>
+                            <h1 className="font-serif italic text-6xl text-deep-espresso">
+                                {filters.search ? 'Поиск' : 'Коллекция'}
+                            </h1>
+                            {filters.search && (
+                                <p className="mt-4 text-sm text-deep-espresso/60 uppercase tracking-widest font-medium">
+                                    {usePage().props.isFuzzy 
+                                        ? <span>Ничего не нашли по точному запросу, возможно вы имели в виду: <span className="text-champagne-gold font-bold">"{filters.search}"</span>?</span>
+                                        : <span>Результаты для: <span className="text-deep-espresso font-bold">"{filters.search}"</span></span>
+                                    }
+                                </p>
+                            )}
                         </div>
                         <div className="flex flex-wrap gap-x-10 gap-y-4 uppercase tracking-[0.2em] text-[10px] font-semibold text-deep-espresso/40">
                             <Link href={route('catalog.index')} className={!filters.category ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Все</Link>
@@ -226,7 +236,7 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
                     {products.map((product) => (
                         <div key={product.id} className="group">
-                            <Link href={route('catalog.show', product.slug)}>
+                            <Link href={route('catalog.show', product.slug)} className="block">
                                 <div className="aspect-[4/5] overflow-hidden bg-[#F0F0F0] mb-6 relative border border-deep-espresso/5 shadow-sm">
                                     <div className="w-full h-full flex items-center justify-center transition-transform duration-1000 ease-out group-hover:scale-110">
                                         <div className="absolute inset-0 bg-gradient-to-t from-deep-espresso/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -282,12 +292,18 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
                             </Link>
                             {product.skus && product.skus.length > 0 && (
                                 <div className="px-4 mt-2">
-                                    <button 
-                                        onClick={() => addToCart(product.skus[0].id)}
-                                        className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
-                                    >
-                                        В корзину
-                                    </button>
+                                    {product.skus.some(s => s.stock > 0) ? (
+                                        <button 
+                                            onClick={() => addToCart(product.skus.find(s => s.stock > 0).id)}
+                                            className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
+                                        >
+                                            В корзину
+                                        </button>
+                                    ) : (
+                                        <div className="w-full py-3 bg-red-800/5 text-red-800 text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 text-center">
+                                            Нет в наличии
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

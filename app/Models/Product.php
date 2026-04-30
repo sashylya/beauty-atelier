@@ -16,6 +16,11 @@ class Product extends Model
         return $this->hasMany(Sku::class);
     }
 
+    public function orderItems()
+    {
+        return $this->hasManyThrough(OrderItem::class, Sku::class);
+    }
+
     public function favoritedBy()
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
