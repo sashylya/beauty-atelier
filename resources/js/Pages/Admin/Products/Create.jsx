@@ -10,12 +10,17 @@ export default function Create() {
         category: 'face',
         price: '',
         image: null,
+        additional_images: [],
         is_look_of_month: false,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route('admin.products.store'));
+    };
+
+    const handleAdditionalImagesChange = (e) => {
+        setData('additional_images', Array.from(e.target.files));
     };
 
     return (
@@ -93,6 +98,21 @@ export default function Create() {
                                 accept="image/*"
                             />
                             {errors.image && <div className="text-red-500 text-xs mt-1">{errors.image}</div>}
+                        </div>
+
+                        <div>
+                            <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="additional_images">
+                                Дополнительные фото
+                            </label>
+                            <input
+                                type="file"
+                                id="additional_images"
+                                multiple
+                                onChange={handleAdditionalImagesChange}
+                                className="w-full text-xs text-gray-500 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F]/5 file:text-[#3D2B1F] hover:file:bg-[#3D2B1F]/10"
+                                accept="image/*"
+                            />
+                            {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
                         </div>
                     </div>
 

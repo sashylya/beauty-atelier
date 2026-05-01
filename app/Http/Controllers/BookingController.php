@@ -105,6 +105,46 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Бронирование отменено.');
     }
 
+    public function checkStatus(Booking $booking)
+    {
+        if (!$booking->payment_id || $booking->status !== Booking::STATUS_PENDING) {
+            return $booking;
+        }
+
+        $shopId = config('services.yookassa.shop_id');
+        $secretKey = config('services.yookassa.secret_key');
+
+        if (!$shopId || !$secretKey) {
+            return $booking;
+        }
+
+        try {
+            $response = Http::withBasicAuth($shopId, $secretKey)
+                ->withoutVerifying()
+                ->get("https://api.yookassa.ru/v3/payments/{$booking->payment_id}");
+
+            if ($response->successful()) {
+                $payment = $response->json();
+                if ($payment['status'] === 'succeeded') {
+                    $booking->update([
+                        'status' => Booking::STATUS_PAID,
+                        'paid_at' => now(),
+                    ]);
+                } elseif ($payment['status'] === 'canceled') {
+                    // Можно сбросить payment_id чтобы можно было попробовать снова
+                    $booking->update([
+                        'payment_id' => null,
+                        'payment_url' => null,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('YooKassa Status Check Error: ' . $e->getMessage());
+        }
+
+        return $booking;
+    }
+
     public function webhook(Request $request)
     {
         $source = $request->all();
@@ -125,5 +165,27 @@ class BookingController extends Controller
         }
 
         return response('OK', 200);
+    }
+
+    public function ticket(Booking $booking)
+    {
+        if ($booking->user_id !== Auth::id() && !Auth::user()->is_admin) {
+            abort(403);
+        }
+
+        if ($booking->status !== Booking::STATUS_PAID && $booking->status !== Booking::STATUS_CONFIRMED) {
+            return redirect()->route('dashboard')->with('error', 'Билет доступен только после оплаты.');
+        }
+
+        $booking->load('masterClass', 'user');
+
+        // Генерируем URL для QR-кода (например, ссылка на проверку билета или просто код)
+        // Для простоты пока просто код
+        $qrCodeUrl = "https://quickchart.io/qr?text=" . urlencode($booking->ticket_code) . "&size=200&margin=0";
+
+        return Inertia::render('Bookings/Ticket', [
+            'booking' => $booking,
+            'qrCodeUrl' => $qrCodeUrl,
+        ]);
     }
 }

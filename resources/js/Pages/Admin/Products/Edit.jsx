@@ -10,6 +10,7 @@ export default function Edit({ product }) {
         category: product.category,
         price: product.price || '',
         image: null,
+        additional_images: [],
         is_look_of_month: Boolean(product.is_look_of_month),
         _method: 'PATCH',
     });
@@ -17,6 +18,10 @@ export default function Edit({ product }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route('admin.products.update', product.id));
+    };
+
+    const handleAdditionalImagesChange = (e) => {
+        setData('additional_images', Array.from(e.target.files));
     };
 
     return (
@@ -84,7 +89,7 @@ export default function Edit({ product }) {
 
                         <div>
                             <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="image">
-                                Изменить фото
+                                Изменить главное фото
                             </label>
                             <input
                                 type="file"
@@ -95,7 +100,41 @@ export default function Edit({ product }) {
                             />
                             {errors.image && <div className="text-red-500 text-xs mt-1">{errors.image}</div>}
                         </div>
+
+                        <div>
+                            <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="additional_images">
+                                Добавить еще фото
+                            </label>
+                            <input
+                                type="file"
+                                id="additional_images"
+                                multiple
+                                onChange={handleAdditionalImagesChange}
+                                className="w-full text-xs text-gray-500 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F]/5 file:text-[#3D2B1F] hover:file:bg-[#3D2B1F]/10"
+                                accept="image/*"
+                            />
+                            {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
+                        </div>
                     </div>
+
+                    {product.additional_images && product.additional_images.length > 0 && (
+                        <div className="pt-4">
+                            <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3">
+                                Текущие доп. фото
+                            </label>
+                            <div className="flex flex-wrap gap-4">
+                                {product.additional_images.map((path, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <img 
+                                            src={`/storage/${path}`} 
+                                            alt="" 
+                                            className="w-20 h-20 object-cover border border-[#3D2B1F]/10"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="description">

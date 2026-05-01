@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
-export default function Catalog({ products, filters, favoriteProductIds }) {
-    const { auth } = usePage().props;
+export default function Catalog({ products, filters }) {
+    const { auth, favoriteProductIds = [] } = usePage().props;
     const [showFilters, setShowFilters] = useState(false);
     
     // Проверка, активен ли хоть один фильтр (кроме категории и дефолтной сортировки)
@@ -63,6 +63,16 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
         if (name === 'sort') {
             applyFilters(updated);
         }
+    };
+
+    const getShadeLabel = (count) => {
+        if (count === 0) return 'Нет в наличии';
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return `${count} оттенков`;
+        if (lastDigit === 1) return `${count} оттенок`;
+        if (lastDigit >= 2 && lastDigit <= 4) return `${count} оттенка`;
+        return `${count} оттенков`;
     };
 
     const addToCart = (skuId) => {
@@ -278,7 +288,7 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
                                 <div className="text-center px-4">
                                     <h3 className="uppercase tracking-[0.2em] text-[11px] font-bold mb-2 group-hover:text-champagne-gold transition-colors duration-300">{product.name}</h3>
                                     <p className="font-serif italic text-deep-espresso/50 text-xs mb-2">
-                                        {product.skus.length > 0 ? `${product.skus.length} Оттенков` : '1 Оттенок'}
+                                        {getShadeLabel(product.skus.length)}
                                     </p>
                                     <p className="uppercase tracking-[0.1em] text-xs font-semibold mb-4">
                                         {product.price 
@@ -290,22 +300,20 @@ export default function Catalog({ products, filters, favoriteProductIds }) {
                                     </p>
                                 </div>
                             </Link>
-                            {product.skus && product.skus.length > 0 && (
-                                <div className="px-4 mt-2">
-                                    {product.skus.some(s => s.stock > 0) ? (
-                                        <button 
-                                            onClick={() => addToCart(product.skus.find(s => s.stock > 0).id)}
-                                            className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
-                                        >
-                                            В корзину
-                                        </button>
-                                    ) : (
-                                        <div className="w-full py-3 bg-red-800/5 text-red-800 text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 text-center">
-                                            Нет в наличии
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                            <div className="px-4 mt-2">
+                                {product.skus && product.skus.length > 0 && product.skus.some(s => s.stock > 0) ? (
+                                    <button 
+                                        onClick={() => addToCart(product.skus.find(s => s.stock > 0).id)}
+                                        className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
+                                    >
+                                        В корзину
+                                    </button>
+                                ) : (
+                                    <div className="w-full py-3 bg-red-800/5 text-red-800 text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 text-center">
+                                        Нет в наличии
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

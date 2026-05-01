@@ -11,12 +11,11 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $cart = $request->session()->get('cart', []);
-        $wantsPackaging = $request->session()->get('wants_packaging', true);
         
         $items = [];
         $subtotal = 0;
-        $packagingPrice = 300; 
-        $freePackagingThreshold = 2000;
+        $deliveryThreshold = 2000;
+        $deliveryFee = 200;
 
         foreach ($cart as $skuId => $quantity) {
             $sku = Sku::with('product')->find($skuId);
@@ -29,21 +28,18 @@ class CartController extends Controller
             }
         }
 
-        $isPackagingFree = $subtotal >= $freePackagingThreshold;
+        $isDeliveryFree = $subtotal >= $deliveryThreshold;
+        $currentDeliveryFee = ($subtotal > 0 && !$isDeliveryFree) ? $deliveryFee : 0;
         
-        // Если упаковка не бесплатная и пользователь от нее отказался
-        $actualPackagingPrice = ($isPackagingFree || $wantsPackaging) ? ($isPackagingFree ? 0 : $packagingPrice) : 0;
-        
-        $total = $subtotal > 0 ? $subtotal + $actualPackagingPrice : 0;
+        $total = $subtotal > 0 ? $subtotal + $currentDeliveryFee : 0;
 
         return Inertia::render('Cart', [
             'items' => $items,
             'subtotal' => $subtotal,
             'total' => $total,
-            'packagingPrice' => $actualPackagingPrice,
-            'isPackagingFree' => $isPackagingFree,
-            'wantsPackaging' => $wantsPackaging,
-            'freePackagingThreshold' => $freePackagingThreshold
+            'deliveryFee' => $currentDeliveryFee,
+            'isDeliveryFree' => $isDeliveryFree,
+            'deliveryThreshold' => $deliveryThreshold
         ]);
     }
 

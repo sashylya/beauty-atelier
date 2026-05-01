@@ -21,8 +21,20 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => [
+                'required', 
+                'string', 
+                'email', 
+                'regex:/^[a-z0-9._%+-]+@gmail\.com$/i'
+            ],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.regex' => 'Вход возможен только с почтой @gmail.com.',
         ];
     }
 

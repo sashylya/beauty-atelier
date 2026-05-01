@@ -14,6 +14,7 @@ class Order extends Model
 
     const STATUS_NEW = 'new';
     const STATUS_PAID = 'paid';
+    const STATUS_PACKED = 'packed';
     const STATUS_SHIPPED = 'shipped';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';

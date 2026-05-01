@@ -44,6 +44,8 @@ export default function Login({ status }) {
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                                 autoComplete="username"
+                                pattern="[a-z0-9._%+-]+@gmail\.com$"
+                                title="Пожалуйста, используйте почту @gmail.com"
                             />
                             {errors.email && <div className="auth-error">{errors.email}</div>}
                         </div>

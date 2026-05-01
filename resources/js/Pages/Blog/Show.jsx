@@ -18,8 +18,12 @@ export default function Show({ post, recentPosts, recommendedProducts }) {
                     
                     {post.author && (
                         <div className="flex items-center justify-center gap-4 mb-10">
-                            <div className="w-10 h-10 bg-champagne-gold/20 rounded-full flex items-center justify-center">
-                                <span className="text-champagne-gold font-bold text-xs">{post.author.name.charAt(0)}</span>
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-champagne-gold/20 border border-champagne-gold/10">
+                                {post.author.avatar ? (
+                                    <img src={`/storage/${post.author.avatar}`} alt={post.author.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-champagne-gold font-bold text-xs">{post.author.name.charAt(0)}</span>
+                                )}
                             </div>
                             <div className="text-left">
                                 <p className="text-[10px] uppercase tracking-widest font-bold text-deep-espresso">Автор: {post.author.name}</p>
@@ -79,8 +83,12 @@ export default function Show({ post, recentPosts, recommendedProducts }) {
                     {post.author && post.author.biography && (
                         <div className="border-y border-deep-espresso/5 py-12 mb-20">
                             <div className="flex flex-col md:flex-row gap-10 items-center md:items-start text-center md:text-left">
-                                <div className="w-20 h-20 bg-deep-espresso text-creamy-silk rounded-full flex-shrink-0 flex items-center justify-center text-2xl font-serif italic">
-                                    {post.author.name.charAt(0)}
+                                <div className="w-20 h-20 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden bg-deep-espresso text-creamy-silk text-2xl font-serif italic border border-deep-espresso/10 shadow-sm">
+                                    {post.author.avatar ? (
+                                        <img src={`/storage/${post.author.avatar}`} alt={post.author.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        post.author.name.charAt(0)
+                                    )}
                                 </div>
                                 <div>
                                     <h4 className="uppercase tracking-[0.2em] text-[11px] font-bold text-deep-espresso mb-4">Об авторе</h4>

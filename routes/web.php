@@ -33,8 +33,23 @@ Route::get('/about', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
-        $orders = Auth::user()->orders()->with('items.sku.product')->latest()->get();
-        $bookings = Auth::user()->bookings()->with('masterClass')->latest()->get();
+        $user = Auth::user();
+        
+        // Проверяем статусы платежей для незавершенных заказов и броней
+        $pendingOrders = $user->orders()->where('status', \App\Models\Order::STATUS_NEW)->whereNotNull('payment_id')->get();
+        $orderController = app(\App\Http\Controllers\OrderController::class);
+        foreach ($pendingOrders as $order) {
+            $orderController->checkStatus($order);
+        }
+
+        $pendingBookings = $user->bookings()->where('status', \App\Models\Booking::STATUS_PENDING)->whereNotNull('payment_id')->get();
+        $bookingController = app(\App\Http\Controllers\BookingController::class);
+        foreach ($pendingBookings as $booking) {
+            $bookingController->checkStatus($booking);
+        }
+
+        $orders = $user->orders()->with('items.sku.product')->latest()->get();
+        $bookings = $user->bookings()->with('masterClass')->latest()->get();
 
         return Inertia::render('Dashboard', [
             'orders' => $orders,
@@ -58,11 +73,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Избранное
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/wishlist/toggle/{id}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    // Отзывы
+    Route::post('/product/{product}/review', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
 
     Route::post('/master-classes/{masterClass}/book', [BookingController::class, 'store'])->name('master-classes.book');
     Route::post('/bookings/{booking}/pay', [BookingController::class, 'pay'])->name('bookings.pay');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::get('/bookings/{booking}/ticket', [BookingController::class, 'ticket'])->name('bookings.ticket');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -93,6 +112,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Управление пользователями
     Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
     Route::post('/users/{user}/toggle-status', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
+    // Управление заказами
+    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+
+    // Модерация отзывов
+    Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::delete('/reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 

@@ -72,16 +72,34 @@ export default function Dashboard({ auth, orders, bookings }) {
                                                 <p className="text-[10px] uppercase tracking-widest opacity-60 mb-1">Локация</p>
                                                 <p className="font-serif italic text-sm">{booking.master_class.location}</p>
                                                 <div className="mt-4 flex gap-4">
-                                                    {booking.status === 'pending' && (
+                                                    {(booking.status === 'paid' || booking.status === 'confirmed') && (
                                                         <Link 
-                                                            href={route('bookings.cancel', booking.id)} 
-                                                            method="post"
-                                                            as="button"
-                                                            onBefore={() => confirm('Отменить бронирование?')}
-                                                            className="text-[9px] uppercase tracking-widest font-bold text-red-800/40 hover:text-red-800 transition"
+                                                            href={route('bookings.ticket', booking.id)} 
+                                                            className="text-[9px] uppercase tracking-widest font-bold text-champagne-gold border-b border-champagne-gold hover:opacity-70 transition"
                                                         >
-                                                            Отменить
+                                                            Показать билет
                                                         </Link>
+                                                    )}
+                                                    {booking.status === 'pending' && (
+                                                        <>
+                                                            <Link 
+                                                                href={route('bookings.pay', booking.id)} 
+                                                                method="post"
+                                                                as="button"
+                                                                className="text-[9px] uppercase tracking-widest font-bold text-champagne-gold border-b border-champagne-gold hover:opacity-70 transition"
+                                                            >
+                                                                Оплатить
+                                                            </Link>
+                                                            <Link 
+                                                                href={route('bookings.cancel', booking.id)} 
+                                                                method="post"
+                                                                as="button"
+                                                                onBefore={() => confirm('Отменить бронирование?')}
+                                                                className="text-[9px] uppercase tracking-widest font-bold text-red-800/40 hover:text-red-800 transition"
+                                                            >
+                                                                Отменить
+                                                            </Link>
+                                                        </>
                                                     )}
                                                 </div>
                                             </div>
@@ -130,6 +148,7 @@ export default function Dashboard({ auth, orders, bookings }) {
                                             }`}>
                                                 {order.status === 'new' ? 'Ожидает оплаты' : 
                                                  order.status === 'paid' ? 'Оплачено' : 
+                                                 order.status === 'packed' ? 'Собран' : 
                                                  order.status === 'shipped' ? 'Отправлено' : 
                                                  order.status === 'completed' ? 'Завершено' : 
                                                  order.status === 'cancelled' ? 'Отменено' : order.status}
@@ -153,12 +172,12 @@ export default function Dashboard({ auth, orders, bookings }) {
 
                                         <div className="flex justify-between items-center pt-4 border-t border-deep-espresso/5">
                                             <div>
-                                                {order.status === 'new' && (
+                                                {(order.status === 'new' || order.status === 'paid') && (
                                                     <Link 
                                                         href={route('orders.cancel', order.id)} 
                                                         method="post"
                                                         as="button"
-                                                        onBefore={() => confirm('Вы уверены, что хотите отменить этот заказ? Товары вернутся в каталог.')}
+                                                        onBefore={() => confirm(order.status === 'paid' ? 'Вы уверены? Заказ оплачен, средства будут возвращены на карту.' : 'Вы уверены, что хотите отменить этот заказ? Товары вернутся в каталог.')}
                                                         className="text-[9px] uppercase tracking-[0.2em] font-bold text-red-800/40 hover:text-red-800 transition"
                                                     >
                                                         Отменить заказ

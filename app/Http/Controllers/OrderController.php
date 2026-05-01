@@ -37,28 +37,29 @@ class OrderController extends Controller
             }
         }
 
-        $wantsPackaging = $request->session()->get('wants_packaging', true);
-        $packagingPrice = 300;
-        $freePackagingThreshold = 2000;
-        $isPackagingFree = $subtotal >= $freePackagingThreshold;
-        $actualPackagingPrice = ($isPackagingFree || $wantsPackaging) ? ($isPackagingFree ? 0 : $packagingPrice) : 0;
+        $deliveryThreshold = 2000;
+        $deliveryFee = 200;
+        $isDeliveryFree = $subtotal >= $deliveryThreshold;
+        $currentDeliveryFee = ($subtotal > 0 && !$isDeliveryFree) ? $deliveryFee : 0;
         
-        $total = $subtotal + $actualPackagingPrice;
+        $total = $subtotal + $currentDeliveryFee;
 
         return Inertia::render('Checkout/Index', [
             'items' => $items,
             'total' => $total,
             'subtotal' => $subtotal,
-            'packagingPrice' => $actualPackagingPrice
+            'deliveryFee' => $currentDeliveryFee,
+            'isDeliveryFree' => $isDeliveryFree
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'shipping_address' => 'required|string|max:500',
-            'gift_message' => 'nullable|string|max:1000',
-            'is_gift' => 'boolean',
+            'city' => 'required|string|max:100|min:2',
+            'street' => 'required|string|max:255|min:2',
+            'house' => 'required|numeric|max_digits:10',
+            'apartment' => 'required|numeric|max_digits:10',
         ]);
 
         $cart = $request->session()->get('cart', []);
@@ -84,19 +85,22 @@ class OrderController extends Controller
                 $subtotal += $sku->price * $quantity;
             }
 
-            $wantsPackaging = $request->session()->get('wants_packaging', true);
-            $packagingPrice = 300;
-            $isPackagingFree = $subtotal >= 2000;
-            $actualPackagingPrice = ($isPackagingFree || $wantsPackaging) ? ($isPackagingFree ? 0 : $packagingPrice) : 0;
-            $total = $subtotal + $actualPackagingPrice;
+            $deliveryThreshold = 2000;
+            $deliveryFee = 200;
+            $isDeliveryFree = $subtotal >= $deliveryThreshold;
+            $currentDeliveryFee = ($subtotal > 0 && !$isDeliveryFree) ? $deliveryFee : 0;
+            $total = $subtotal + $currentDeliveryFee;
+
+            $shippingAddress = "г. {$request->city}, ул. {$request->street}, д. {$request->house}";
+            if ($request->apartment) {
+                $shippingAddress .= ", кв. {$request->apartment}";
+            }
 
             $order = Order::create([
                 'user_id' => auth()->id(),
                 'total_amount' => $total,
                 'status' => Order::STATUS_NEW,
-                'shipping_address' => $request->shipping_address,
-                'is_gift' => $request->is_gift ?? false,
-                'gift_message' => $request->gift_message,
+                'shipping_address' => $shippingAddress,
             ]);
 
             foreach ($itemsToCreate as $itemData) {
@@ -205,8 +209,8 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Заказ уже отменен.');
         }
 
-        if ($order->status === Order::STATUS_PAID || $order->status === Order::STATUS_SHIPPED) {
-             return redirect()->back()->with('error', 'Нельзя отменить оплаченный или отправленный заказ через сайт. Обратитесь в поддержку.');
+        if ($order->status === Order::STATUS_PACKED || $order->status === Order::STATUS_SHIPPED || $order->status === Order::STATUS_COMPLETED) {
+             return redirect()->back()->with('error', 'Заказ уже собирается или отправлен, его нельзя отменить самостоятельно. Обратитесь в поддержку.');
         }
 
         DB::transaction(function () use ($order) {
@@ -214,7 +218,51 @@ class OrderController extends Controller
             $order->restoreStock();
         });
 
-        return redirect()->back()->with('success', 'Заказ отменен, товары возвращены на склад.');
+        $message = 'Заказ отменен, товары возвращены на склад.';
+        if ($order->status === Order::STATUS_PAID) {
+            $message .= ' Средства будут возвращены на вашу карту в течение нескольких дней.';
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function checkStatus(Order $order)
+    {
+        if (!$order->payment_id || $order->status !== Order::STATUS_NEW) {
+            return $order;
+        }
+
+        $shopId = config('services.yookassa.shop_id');
+        $secretKey = config('services.yookassa.secret_key');
+
+        if (!$shopId || !$secretKey) {
+            return $order;
+        }
+
+        try {
+            $response = Http::withBasicAuth($shopId, $secretKey)
+                ->withoutVerifying()
+                ->get("https://api.yookassa.ru/v3/payments/{$order->payment_id}");
+
+            if ($response->successful()) {
+                $payment = $response->json();
+                if ($payment['status'] === 'succeeded') {
+                    $order->update([
+                        'status' => Order::STATUS_PAID,
+                        'paid_at' => now(),
+                    ]);
+                } elseif ($payment['status'] === 'canceled') {
+                    $order->update([
+                        'payment_id' => null,
+                        'payment_url' => null,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('YooKassa Order Status Check Error: ' . $e->getMessage());
+        }
+
+        return $order;
     }
 
     public function webhook(Request $request)

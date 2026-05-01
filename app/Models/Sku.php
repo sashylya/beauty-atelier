@@ -11,6 +11,10 @@ class Sku extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'additional_images' => 'array',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

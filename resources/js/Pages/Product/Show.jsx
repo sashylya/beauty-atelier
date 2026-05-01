@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
 
-export default function Show({ product, favoriteSkuIds }) {
-    const { auth } = usePage().props;
+export default function Show({ product, reviews = [], averageRating = 0 }) {
+    const { auth, flash, favoriteSkuIds = [] } = usePage().props;
     
     // Если SKU нет, создаем "фейковый" объект из данных товара для обратной совместимости
     const defaultSku = product.skus.length > 0 ? product.skus[0] : {
@@ -20,6 +20,32 @@ export default function Show({ product, favoriteSkuIds }) {
     const [selectedSku, setSelectedSku] = useState(defaultSku);
     const [comparisonSku, setComparisonSku] = useState(null);
     const [isComparing, setIsComparing] = useState(false);
+    const [activeImage, setActiveImage] = useState(null);
+
+    // Собираем все изображения
+    const allImages = [
+        selectedSku.image_url ? `/storage/${selectedSku.image_url}` : null,
+        ...(selectedSku.additional_images || []).map(path => `/storage/${path}`),
+        product.image_path ? `/storage/${product.image_path}` : null,
+        ...(product.additional_images || []).map(path => `/storage/${path}`)
+    ].filter((img, index, self) => img !== null && self.indexOf(img) === index);
+
+    // Обновляем активное изображение при смене SKU
+    React.useEffect(() => {
+        if (selectedSku.image_url) {
+            setActiveImage(`/storage/${selectedSku.image_url}`);
+        } else if (!activeImage && product.image_path) {
+            setActiveImage(`/storage/${product.image_path}`);
+        }
+    }, [selectedSku]);
+
+    // Инициализация при первой загрузке
+    React.useEffect(() => {
+        if (!activeImage) {
+            const initial = selectedSku.image_url || product.image_path;
+            if (initial) setActiveImage(`/storage/${initial}`);
+        }
+    }, []);
 
     const { post, processing } = useForm();
 
@@ -46,6 +72,20 @@ export default function Show({ product, favoriteSkuIds }) {
 
     const isFavorited = (favoriteSkuIds || []).includes(selectedSku.id);
 
+    // Form for reviews
+    const { data: reviewData, setData: setReviewData, post: postReview, processing: processingReview, reset: resetReview, errors: reviewErrors } = useForm({
+        rating: 5,
+        comment: '',
+    });
+
+    const submitReview = (e) => {
+        e.preventDefault();
+        postReview(route('reviews.store', product.id), {
+            onSuccess: () => resetReview(),
+            preserveScroll: true,
+        });
+    };
+
     return (
         <BeautyLayout>
             <Head title={`${product.name} — Beauty Atelier`} />
@@ -67,9 +107,9 @@ export default function Show({ product, favoriteSkuIds }) {
                                     <div className="w-1/2 h-full relative overflow-hidden border-r border-[#3D2B1F]/10">
                                         <div className="absolute inset-0">
                                             {selectedSku.image_url ? (
-                                                <img src={`/storage/${selectedSku.image_url}`} alt="" className="w-full h-full object-cover" />
+                                                <img src={`/storage/${selectedSku.image_url}`} alt="" className="w-full h-full object-contain" />
                                             ) : (
-                                                <img src={`/storage/${product.image_path}`} alt="" className="w-full h-full object-cover" />
+                                                <img src={`/storage/${product.image_path}`} alt="" className="w-full h-full object-contain" />
                                             )}
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -79,9 +119,9 @@ export default function Show({ product, favoriteSkuIds }) {
                                     <div className="w-1/2 h-full relative overflow-hidden">
                                         <div className="absolute inset-0">
                                             {comparisonSku.image_url ? (
-                                                <img src={`/storage/${comparisonSku.image_url}`} alt="" className="w-full h-full object-cover" />
+                                                <img src={`/storage/${comparisonSku.image_url}`} alt="" className="w-full h-full object-contain" />
                                             ) : (
-                                                <img src={`/storage/${product.image_path}`} alt="" className="w-full h-full object-cover" />
+                                                <img src={`/storage/${product.image_path}`} alt="" className="w-full h-full object-contain" />
                                             )}
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -99,13 +139,30 @@ export default function Show({ product, favoriteSkuIds }) {
 
                              {/* Main Visual */}
                              <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
-                                {selectedSku.image_url ? (
-                                    <img src={`/storage/${selectedSku.image_url}`} alt={selectedSku.shade_name} className="w-full h-full object-cover animate-fade-in" key={selectedSku.id} />
+                                {activeImage ? (
+                                    <img src={activeImage} alt={product.name} className="w-full h-full object-cover animate-fade-in" key={activeImage} />
                                 ) : (
-                                    <img src={`/storage/${product.image_path}`} alt={product.name} className="w-full h-full object-cover" />
+                                    <div className="w-full h-full flex items-center justify-center opacity-10">
+                                        <span className="font-serif italic text-6xl">BA</span>
+                                    </div>
                                 )}
                              </div>
                         </div>
+
+                        {/* Thumbnails */}
+                        {allImages.length > 1 && (
+                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                                {allImages.map((img, idx) => (
+                                    <button 
+                                        key={idx} 
+                                        onClick={() => setActiveImage(img)}
+                                        className={`w-24 h-24 flex-shrink-0 border-2 transition-all duration-300 ${activeImage === img ? 'border-[#3D2B1F]' : 'border-transparent hover:border-[#3D2B1F]/20'}`}
+                                    >
+                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Right: Details */}
@@ -127,8 +184,20 @@ export default function Show({ product, favoriteSkuIds }) {
                                 <span className="text-champagne-gold uppercase">{product.category}</span>
                             </nav>
                             <h1 className="font-serif italic text-5xl lg:text-6xl text-deep-espresso mb-8 leading-tight">{product.name}</h1>
-                            <div className="flex items-baseline space-x-6 mb-12">
+                            <div className="flex items-center space-x-6 mb-12">
                                 <span className="text-3xl font-light tracking-tight text-deep-espresso">{parseFloat(selectedSku.price || product.price || 0).toLocaleString()} ₽</span>
+                                {averageRating > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex text-champagne-gold">
+                                            {[...Array(5)].map((_, i) => (
+                                                <svg key={i} className={`w-4 h-4 ${i < Math.round(averageRating) ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                </svg>
+                                            ))}
+                                        </div>
+                                        <span className="text-sm font-serif italic text-deep-espresso/60">{averageRating} / 5</span>
+                                    </div>
+                                )}
                             </div>
                             <p className="text-deep-espresso/70 leading-relaxed mb-12 text-sm lg:text-base">{product.description}</p>
                         </div>
@@ -174,11 +243,11 @@ export default function Show({ product, favoriteSkuIds }) {
                         <div className="flex gap-4 mb-4">
                             <button 
                                 onClick={addToCart}
-                                disabled={processing || (product.skus.length === 0 && !product.price) || (selectedSku.id && selectedSku.stock <= 0)}
+                                disabled={processing || product.skus.length === 0 || (selectedSku.id && selectedSku.stock <= 0)}
                                 className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {product.skus.length === 0 && !product.price 
-                                    ? 'Скоро в продаже' 
+                                {product.skus.length === 0 
+                                    ? 'Нет в наличии' 
                                     : (selectedSku.id && selectedSku.stock <= 0 
                                         ? 'Нет в наличии' 
                                         : (processing ? 'Добавляем...' : 'Добавить в корзину'))}
@@ -228,8 +297,105 @@ export default function Show({ product, favoriteSkuIds }) {
                             </details>
                             <details className="group border-b border-deep-espresso/10 pb-6 cursor-pointer">
                                 <summary className="list-none flex justify-between items-center uppercase tracking-[0.2em] text-[10px] font-bold group-open:text-champagne-gold transition-colors">Доставка<span className="text-lg group-open:rotate-45 transition-transform duration-300 font-light">+</span></summary>
-                                <div className="mt-6 text-[13px] text-deep-espresso/60 leading-relaxed font-light">Фирменная упаковка в подарок при заказе от 2 000 ₽. <br/>Доставка в течение 2-3 рабочих дней по Москве.</div>
+                                <div className="mt-6 text-[13px] text-deep-espresso/60 leading-relaxed font-light">Бесплатная доставка при заказе от 2 000 ₽. <br/>При заказе до 2 000 ₽ стоимость доставки — 200 ₽. <br/>Доставка в течение 2-3 рабочих дней по Москве.</div>
                             </details>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Reviews Section */}
+                <div className="mt-32 pt-20 border-t border-deep-espresso/10">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                        <div className="lg:col-span-4">
+                            <h2 className="font-serif italic text-4xl text-deep-espresso mb-8">Отзывы</h2>
+                            <p className="text-deep-espresso/60 text-sm leading-relaxed mb-12">Мы ценим ваше мнение о нашей продукции. Поделитесь своим опытом использования, чтобы помочь другим сделать правильный выбор.</p>
+                            
+                            {auth.user ? (
+                                <form onSubmit={submitReview} className="space-y-6 bg-creamy-silk/30 p-8 rounded-sm border border-deep-espresso/5">
+                                    {flash?.success && (
+                                        <div className="bg-green-50 text-green-700 p-4 text-xs uppercase tracking-widest font-bold mb-6">
+                                            {flash.success}
+                                        </div>
+                                    )}
+                                    
+                                    <div>
+                                        <label className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Ваша оценка</label>
+                                        <div className="flex gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() => setReviewData('rating', star)}
+                                                    className={`transition-colors ${reviewData.rating >= star ? 'text-champagne-gold' : 'text-deep-espresso/20 hover:text-champagne-gold/50'}`}
+                                                >
+                                                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                    </svg>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Ваш отзыв</label>
+                                        <textarea
+                                            value={reviewData.comment}
+                                            onChange={(e) => setReviewData('comment', e.target.value)}
+                                            className="w-full bg-white border border-deep-espresso/10 p-4 text-sm focus:ring-1 focus:ring-champagne-gold focus:border-champagne-gold outline-none min-h-[120px]"
+                                            placeholder="Поделитесь вашими впечатлениями..."
+                                            required
+                                        ></textarea>
+                                        {reviewErrors.comment && <p className="text-red-500 text-[10px] mt-2 uppercase tracking-widest">{reviewErrors.comment}</p>}
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={processingReview}
+                                        className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.3em] text-[10px] font-bold py-4 hover:bg-black transition-all disabled:opacity-50"
+                                    >
+                                        {processingReview ? 'Отправка...' : 'Опубликовать'}
+                                    </button>
+                                </form>
+                            ) : (
+                                <div className="bg-creamy-silk/30 p-8 rounded-sm border border-deep-espresso/5 text-center">
+                                    <p className="text-deep-espresso/60 text-sm mb-6">Только авторизованные пользователи могут оставлять отзывы.</p>
+                                    <Link href={route('login')} className="inline-block bg-deep-espresso text-creamy-silk uppercase tracking-[0.3em] text-[10px] font-bold py-4 px-8 hover:bg-black transition-all">Войти</Link>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="lg:col-span-8 space-y-12">
+                            {reviews.length > 0 ? (
+                                <div className="space-y-12">
+                                    {reviews.map((review) => (
+                                        <div key={review.id} className="border-b border-deep-espresso/5 pb-12 last:border-0">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <p className="font-serif italic text-xl text-deep-espresso">{review.user.name}</p>
+                                                    <div className="flex text-champagne-gold mt-1">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <svg key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                            </svg>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <span className="text-[10px] uppercase tracking-[0.2em] text-deep-espresso/30">
+                                                    {new Date(review.created_at).toLocaleDateString('ru-RU')}
+                                                </span>
+                                            </div>
+                                            <p className="text-deep-espresso/70 leading-relaxed text-sm lg:text-base italic">"{review.comment}"</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center text-center opacity-30 py-20">
+                                    <svg className="w-12 h-12 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                    </svg>
+                                    <p className="font-serif italic text-lg">Пока нет ни одного отзыва</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

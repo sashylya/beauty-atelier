@@ -22,7 +22,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'cartCount' => array_sum($request->session()->get('cart', [])),
-            'wishlistCount' => $request->user() ? $request->user()->favoriteProducts()->count() : 0,
+            'wishlistCount' => $request->user() ? \Illuminate\Support\Facades\DB::table('favorites')->where('user_id', $request->user()->id)->count() : 0,
+            'favoriteProductIds' => $request->user() ? \Illuminate\Support\Facades\DB::table('favorites')->where('user_id', $request->user()->id)->pluck('product_id')->unique()->toArray() : [],
+            'favoriteSkuIds' => $request->user() ? $request->user()->favoriteSkus()->pluck('skus.id')->toArray() : [],
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),

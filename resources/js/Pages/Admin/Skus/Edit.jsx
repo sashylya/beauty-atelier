@@ -9,7 +9,7 @@ export default function Edit({ product, sku }) {
         price: sku.price,
         stock: sku.stock,
         image: null,
-        video_url: sku.video_url || '',
+        additional_images: [],
         coverage: sku.coverage || '',
         finish: sku.finish || '',
         dress_code: sku.dress_code || '',
@@ -21,6 +21,10 @@ export default function Edit({ product, sku }) {
         e.preventDefault();
         // Используем post с _method: 'PATCH' для корректной работы с файлами
         post(route('admin.products.skus.update', [product.id, sku.id]));
+    };
+
+    const handleAdditionalImagesChange = (e) => {
+        setData('additional_images', Array.from(e.target.files));
     };
 
     return (
@@ -114,7 +118,7 @@ export default function Edit({ product, sku }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="image">
-                                    Заменить фото оттенка
+                                    Заменить главное фото оттенка
                                 </label>
                                 <input
                                     type="file"
@@ -127,23 +131,33 @@ export default function Edit({ product, sku }) {
                                 
                                 {sku.image_url && (
                                     <div className="mt-4 flex items-center gap-3">
-                                        <span className="text-[9px] uppercase tracking-widest text-[#3D2B1F]/40">Текущее фото:</span>
+                                        <span className="text-[9px] uppercase tracking-widest text-[#3D2B1F]/40">Текущее главное:</span>
                                         <img src={`/storage/${sku.image_url}`} alt="" className="w-12 h-12 object-cover border border-[#3D2B1F]/10" />
                                     </div>
                                 )}
                             </div>
 
                             <div>
-                                <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="video_url">
-                                    Ссылка на видео/текстуру
+                                <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="additional_images">
+                                    Добавить еще фото оттенка
                                 </label>
-                                 <input
-                                    type="text"
-                                    id="video_url"
-                                    value={data.video_url}
-                                    onChange={(e) => setData('video_url', e.target.value)}
-                                    className="w-full border-[#3D2B1F]/20 focus:border-[#D4AF37] focus:ring-0 text-[#3D2B1F] p-3"
+                                <input
+                                    type="file"
+                                    id="additional_images"
+                                    multiple
+                                    onChange={handleAdditionalImagesChange}
+                                    className="w-full text-xs text-gray-500 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F]/5 file:text-[#3D2B1F] hover:file:bg-[#3D2B1F]/10"
+                                    accept="image/*"
                                 />
+                                {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
+
+                                {sku.additional_images && sku.additional_images.length > 0 && (
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        {sku.additional_images.map((path, idx) => (
+                                            <img key={idx} src={`/storage/${path}`} alt="" className="w-10 h-10 object-cover border border-[#3D2B1F]/10" />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

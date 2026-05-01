@@ -37,9 +37,11 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'composition' => 'nullable|string',
             'category' => 'required|string|max:50',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_look_of_month' => 'boolean',
         ]);
 
@@ -50,7 +52,16 @@ class ProductController extends Controller
             $validated['image_path'] = $path;
         }
 
+        if ($request->hasFile('additional_images')) {
+            $additionalPaths = [];
+            foreach ($request->file('additional_images') as $file) {
+                $additionalPaths[] = $file->store('products', 'public');
+            }
+            $validated['additional_images'] = $additionalPaths;
+        }
+
         unset($validated['image']);
+        unset($validated['additional_images_files']); // Cleanup if sent
 
         if (isset($validated['price'])) {
             $validated['price'] = round($validated['price']);
@@ -79,9 +90,11 @@ class ProductController extends Controller
          $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'composition' => 'nullable|string',
             'category' => 'required|string|max:50',
             'price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_look_of_month' => 'boolean',
         ]);
 
@@ -92,6 +105,14 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
             $validated['image_path'] = $path;
+        }
+
+        if ($request->hasFile('additional_images')) {
+            $additionalPaths = $product->additional_images ?? [];
+            foreach ($request->file('additional_images') as $file) {
+                $additionalPaths[] = $file->store('products', 'public');
+            }
+            $validated['additional_images'] = $additionalPaths;
         }
 
         unset($validated['image']);

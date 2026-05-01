@@ -40,6 +40,8 @@ class MasterClassController extends Controller
             $validated['image_url'] = $request->file('image')->store('master-classes', 'public');
         }
 
+        unset($validated['image']);
+
         MasterClass::create($validated);
 
         return redirect()->route('admin.master-classes.index');
@@ -71,6 +73,8 @@ class MasterClassController extends Controller
             }
             $validated['image_url'] = $request->file('image')->store('master-classes', 'public');
         }
+
+        unset($validated['image']);
 
         $masterClass->update($validated);
 

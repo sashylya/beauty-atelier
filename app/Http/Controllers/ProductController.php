@@ -55,12 +55,10 @@ class ProductController extends Controller
 
                 if ($fuzzyResults->isNotEmpty()) {
                     return Inertia::render('Catalog', [
-                        'products' => $fuzzyResults->values(),
-                        'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
-                        'favoriteProductIds' => $request->user() ? $request->user()->favoriteProducts()->pluck('products.id')->toArray() : [],
-                        'isFuzzy' => true,
-                    ]);
-                }
+                    'products' => $fuzzyResults->values(),
+                    'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
+                    'isFuzzy' => true,
+                    ]);                }
             }
         }
 
@@ -112,17 +110,20 @@ class ProductController extends Controller
         return Inertia::render('Catalog', [
             'products' => $products,
             'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
-            'favoriteProductIds' => $request->user() ? $request->user()->favoriteProducts()->pluck('products.id')->toArray() : [],
         ]);
     }
 
     public function show($slug)
     {
-        $product = Product::with('skus')->where('slug', $slug)->firstOrFail();
+        $product = Product::with(['skus', 'approvedReviews.user'])->where('slug', $slug)->firstOrFail();
+        
+        // Добавляем вычисляемые поля
+        $product->append('average_rating');
 
         return Inertia::render('Product/Show', [
             'product' => $product,
-            'favoriteSkuIds' => auth()->user() ? auth()->user()->favoriteSkus()->pluck('skus.id')->toArray() : [],
+            'reviews' => $product->approvedReviews,
+            'averageRating' => $product->averageRating(),
         ]);
     }
 }

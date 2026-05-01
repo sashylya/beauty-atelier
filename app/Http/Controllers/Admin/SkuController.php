@@ -43,7 +43,7 @@ class SkuController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video_url' => 'nullable|string',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'coverage' => 'nullable|string',
             'finish' => 'nullable|string',
             'dress_code' => 'nullable|string',
@@ -53,6 +53,14 @@ class SkuController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('skus', 'public');
             $validated['image_url'] = $path;
+        }
+
+        if ($request->hasFile('additional_images')) {
+            $additionalPaths = [];
+            foreach ($request->file('additional_images') as $file) {
+                $additionalPaths[] = $file->store('skus', 'public');
+            }
+            $validated['additional_images'] = $additionalPaths;
         }
 
         unset($validated['image']);
@@ -85,7 +93,7 @@ class SkuController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video_url' => 'nullable|string',
+            'additional_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'coverage' => 'nullable|string',
             'finish' => 'nullable|string',
             'dress_code' => 'nullable|string',
@@ -95,6 +103,14 @@ class SkuController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('skus', 'public');
             $validated['image_url'] = $path;
+        }
+
+        if ($request->hasFile('additional_images')) {
+            $additionalPaths = $sku->additional_images ?? [];
+            foreach ($request->file('additional_images') as $file) {
+                $additionalPaths[] = $file->store('skus', 'public');
+            }
+            $validated['additional_images'] = $additionalPaths;
         }
 
         unset($validated['image']);

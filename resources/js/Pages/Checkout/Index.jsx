@@ -2,11 +2,12 @@ import React from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 
-export default function Index({ items, total, subtotal, packagingPrice }) {
+export default function Index({ items, total, subtotal, deliveryFee, isDeliveryFree }) {
     const { data, setData, post, processing, errors } = useForm({
-        shipping_address: '',
-        is_gift: false,
-        gift_message: '',
+        city: '',
+        street: '',
+        house: '',
+        apartment: '',
     });
 
     const submit = (e) => {
@@ -29,41 +30,57 @@ export default function Index({ items, total, subtotal, packagingPrice }) {
                         <form onSubmit={submit} className="space-y-12">
                             <section>
                                 <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-8 pb-4 border-b border-deep-espresso/5">Адрес доставки</h3>
-                                <div>
-                                    <textarea
-                                        value={data.shipping_address}
-                                        onChange={e => setData('shipping_address', e.target.value)}
-                                        className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-6 min-h-[120px] text-sm placeholder:text-deep-espresso/20"
-                                        placeholder="Город, улица, дом, квартира..."
-                                    ></textarea>
-                                    {errors.shipping_address && <div className="text-red-800 text-[10px] mt-2 uppercase tracking-widest">{errors.shipping_address}</div>}
-                                </div>
-                            </section>
-
-                            <section>
-                                <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-8 pb-4 border-b border-deep-espresso/5">Подарочная опция</h3>
-                                <div className="space-y-6">
-                                    <label className="flex items-center gap-4 cursor-pointer group">
-                                        <input 
-                                            type="checkbox" 
-                                            checked={data.is_gift}
-                                            onChange={e => setData('is_gift', e.target.checked)}
-                                            className="w-5 h-5 border-deep-espresso/10 text-deep-espresso focus:ring-0 rounded-sm"
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] uppercase tracking-widest text-deep-espresso/40 font-bold mb-2 block">Город *</label>
+                                        <input
+                                            type="text"
+                                            value={data.city}
+                                            onChange={e => setData('city', e.target.value)}
+                                            className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-4 text-sm"
+                                            placeholder="Например: Москва"
+                                            required
                                         />
-                                        <span className="text-[11px] uppercase tracking-[0.1em] font-medium text-deep-espresso/60 group-hover:text-deep-espresso transition-colors">Это подарок для другого человека</span>
-                                    </label>
-
-                                    {data.is_gift && (
-                                        <div className="animate-fade-in">
-                                            <p className="text-[10px] uppercase tracking-[0.2em] text-deep-espresso/40 mb-4 font-bold">Ваше послание</p>
-                                            <textarea
-                                                value={data.gift_message}
-                                                onChange={e => setData('gift_message', e.target.value)}
-                                                className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-6 min-h-[100px] text-sm placeholder:text-deep-espresso/20"
-                                                placeholder="Напишите несколько теплых слов..."
-                                            ></textarea>
-                                        </div>
-                                    )}
+                                        {errors.city && <div className="text-red-800 text-[10px] mt-2 uppercase tracking-widest">{errors.city}</div>}
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] uppercase tracking-widest text-deep-espresso/40 font-bold mb-2 block">Улица *</label>
+                                        <input
+                                            type="text"
+                                            value={data.street}
+                                            onChange={e => setData('street', e.target.value)}
+                                            className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-4 text-sm"
+                                            placeholder="Например: Арбат"
+                                            required
+                                        />
+                                        {errors.street && <div className="text-red-800 text-[10px] mt-2 uppercase tracking-widest">{errors.street}</div>}
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] uppercase tracking-widest text-deep-espresso/40 font-bold mb-2 block">Дом / Корпус *</label>
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            value={data.house}
+                                            onChange={e => setData('house', e.target.value.replace(/\D/g, ''))}
+                                            className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-4 text-sm"
+                                            placeholder="Например: 10"
+                                            required
+                                        />
+                                        {errors.house && <div className="text-red-800 text-[10px] mt-2 uppercase tracking-widest">{errors.house}</div>}
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] uppercase tracking-widest text-deep-espresso/40 font-bold mb-2 block">Квартира / Офис *</label>
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            value={data.apartment}
+                                            onChange={e => setData('apartment', e.target.value.replace(/\D/g, ''))}
+                                            className="w-full bg-creamy-silk/30 border-deep-espresso/10 focus:border-champagne-gold focus:ring-0 p-4 text-sm"
+                                            placeholder="Например: 5"
+                                            required
+                                        />
+                                        {errors.apartment && <div className="text-red-800 text-[10px] mt-2 uppercase tracking-widest">{errors.apartment}</div>}
+                                    </div>
                                 </div>
                             </section>
 
@@ -109,8 +126,10 @@ export default function Index({ items, total, subtotal, packagingPrice }) {
                                     <span>{subtotal.toLocaleString()} ₽</span>
                                 </div>
                                 <div className="flex justify-between text-[11px] uppercase tracking-widest">
-                                    <span className="opacity-40">Упаковка</span>
-                                    <span>{packagingPrice > 0 ? `${packagingPrice.toLocaleString()} ₽` : 'Бесплатно'}</span>
+                                    <span className="opacity-40">Доставка</span>
+                                    <span className={isDeliveryFree ? "text-champagne-gold font-bold" : ""}>
+                                        {isDeliveryFree ? 'Бесплатно' : `${deliveryFee.toLocaleString()} ₽`}
+                                    </span>
                                 </div>
                             </div>
 

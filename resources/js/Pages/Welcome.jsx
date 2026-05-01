@@ -124,14 +124,14 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                         className={`flex gap-10 overflow-x-auto hide-scrollbar snap-x snap-mandatory scroll-smooth pb-10 ${hitProducts && hitProducts.length <= 3 ? 'justify-center' : ''}`}
                     >
                         {hitProducts && hitProducts.map((product) => (
-                            <div key={product.id} className="w-[240px] md:w-[280px] lg:w-[300px] flex-shrink-0 snap-start group">
+                            <div key={product.id} className="w-[220px] md:w-[260px] lg:w-[280px] flex-shrink-0 snap-start group">
                                  <Link href={route('catalog.show', product.slug)} className="block">
                                     <div className="aspect-[4/5] bg-[#F2F2F2] flex items-center justify-center mb-8 overflow-hidden relative border border-[#3D2B1F]/5 shadow-sm">
                                         {product.image_path ? (
                                             <img 
                                                 src={`/storage/${product.image_path}`} 
                                                 alt={product.name} 
-                                                className="w-full h-full object-contain p-6 transition-transform duration-1000 group-hover:scale-105" 
+                                                className="w-full h-full object-contain p-0 transition-transform duration-1000 group-hover:scale-110" 
                                             />
                                         ) : (
                                             <div className="font-serif italic text-4xl opacity-5 uppercase tracking-widest">{product.category}</div>
@@ -175,7 +175,7 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                 <div className="max-w-[1400px] mx-auto px-6">
                     <div className="flex justify-between items-end mb-20 border-b border-gray-100 pb-8">
                         <h2 className="font-serif text-5xl text-[#4A4A4A]">Дневник <br/> Ателье</h2>
-                        <Link href={route('blog.index')} className="uppercase tracking-[0.2em] text-[10px] font-bold text-gray-400 hover:text-[#8B5A2B] transition mb-2">Подписаться на космо-блог</Link>
+                        <Link href={route('blog.index')} className="uppercase tracking-[0.2em] text-[10px] font-bold text-gray-400 hover:text-[#8B5A2B] transition mb-2">Больше новостей</Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         {latestPosts && latestPosts.map((post) => (

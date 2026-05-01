@@ -9,7 +9,7 @@ export default function Create({ product }) {
         price: product.price || '',
         stock: 10,
         image: null,
-        video_url: '',
+        additional_images: [],
         coverage: '',
         finish: '',
         dress_code: '',
@@ -19,6 +19,10 @@ export default function Create({ product }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route('admin.products.skus.store', product.id));
+    };
+
+    const handleAdditionalImagesChange = (e) => {
+        setData('additional_images', Array.from(e.target.files));
     };
 
     return (
@@ -127,17 +131,18 @@ export default function Create({ product }) {
                             </div>
 
                             <div>
-                                <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="video_url">
-                                    Ссылка на видео/текстуру (необязательно)
+                                <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="additional_images">
+                                    Дополнительные фото оттенка
                                 </label>
-                                 <input
-                                    type="text"
-                                    id="video_url"
-                                    value={data.video_url}
-                                    onChange={(e) => setData('video_url', e.target.value)}
-                                    className="w-full border-[#3D2B1F]/20 focus:border-[#D4AF37] focus:ring-0 text-[#3D2B1F] p-3"
-                                    placeholder="https://..."
+                                <input
+                                    type="file"
+                                    id="additional_images"
+                                    multiple
+                                    onChange={handleAdditionalImagesChange}
+                                    className="w-full text-xs text-gray-500 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-[#3D2B1F]/5 file:text-[#3D2B1F] hover:file:bg-[#3D2B1F]/10"
+                                    accept="image/*"
                                 />
+                                {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
                             </div>
                         </div>
                     </div>

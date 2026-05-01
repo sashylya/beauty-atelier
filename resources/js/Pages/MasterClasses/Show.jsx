@@ -31,6 +31,21 @@ export default function Show({ masterClass, auth }) {
                         <Link href={route('master-classes.index')} className="uppercase tracking-[0.4em] text-[9px] font-bold text-deep-espresso/40 hover:text-champagne-gold transition mb-12 inline-block">
                             ← Назад к мастер-классам
                         </Link>
+
+                        {/* Master Class Image */}
+                        <div className="aspect-[16/9] w-full bg-[#FAF9F6] mb-12 overflow-hidden border border-deep-espresso/5 shadow-sm">
+                            {masterClass.image_url ? (
+                                <img 
+                                    src={`/storage/${masterClass.image_url}`} 
+                                    alt={masterClass.title} 
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center opacity-10">
+                                    <span className="font-serif italic text-[120px]">BA</span>
+                                </div>
+                            )}
+                        </div>
                         
                         <div className="mb-16">
                             <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">новое событие</p>
@@ -156,12 +171,7 @@ export default function Show({ masterClass, auth }) {
                             </form>
                         </div>
 
-                        <div className="mt-12 text-center">
-                            <p className="text-xs italic text-deep-espresso/40">
-                                Нужна индивидуальная консультация? <br/>
-                                <span className="text-champagne-gold uppercase tracking-[0.2em] font-bold cursor-pointer hover:underline">Связаться с нами</span>
-                            </p>
-                        </div>
+
                     </div>
 
                 </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 
-export default function Cart({ items, subtotal, total, packagingPrice, isPackagingFree, wantsPackaging, freePackagingThreshold }) {
+export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFree, deliveryThreshold }) {
     const { post } = useForm();
 
     const removeItem = (skuId) => {
@@ -16,11 +16,7 @@ export default function Cart({ items, subtotal, total, packagingPrice, isPackagi
         router.patch(route('cart.update', skuId), { quantity: newQuantity }, { preserveScroll: true });
     };
 
-    const togglePackaging = () => {
-        router.post(route('cart.toggle-packaging'), {}, { preserveScroll: true });
-    };
-
-    const remainingForFree = freePackagingThreshold - subtotal;
+    const remainingForFree = deliveryThreshold - subtotal;
 
     return (
         <BeautyLayout>
@@ -71,10 +67,10 @@ export default function Cart({ items, subtotal, total, packagingPrice, isPackagi
                                 </div>
                             ))}
 
-                            {!isPackagingFree && (
+                            {!isDeliveryFree && (
                                 <div className="p-6 bg-[#FDF5E6] border border-[#D4AF37]/20 flex items-center justify-between">
                                     <p className="text-[10px] uppercase tracking-[0.2em] text-[#8B5A2B]">
-                                        Добавьте еще на <span className="font-bold">{remainingForFree.toLocaleString()} ₽</span> для бесплатной упаковки
+                                        Добавьте еще на <span className="font-bold">{remainingForFree.toLocaleString()} ₽</span> для бесплатной доставки
                                     </p>
                                     <Link href={route('catalog.index')} className="text-[9px] font-black uppercase tracking-widest border-b border-[#8B5A2B] pb-1">В каталог</Link>
                                 </div>
@@ -91,30 +87,11 @@ export default function Cart({ items, subtotal, total, packagingPrice, isPackagi
                                 
                                 <div className="space-y-4">
                                     <div className="flex justify-between text-sm items-center">
-                                        <span className="uppercase tracking-widest opacity-60">Фирменная упаковка</span>
-                                        <span className={isPackagingFree ? "text-champagne-gold font-bold text-[10px] uppercase tracking-wider" : "text-deep-espresso/60"}>
-                                            {isPackagingFree ? "В подарок" : (wantsPackaging ? `${packagingPrice.toLocaleString()} ₽` : "0 ₽")}
+                                        <span className="uppercase tracking-widest opacity-60">Доставка</span>
+                                        <span className={isDeliveryFree ? "text-champagne-gold font-bold text-[10px] uppercase tracking-wider" : "text-deep-espresso/60"}>
+                                            {isDeliveryFree ? "Бесплатно" : `${deliveryFee.toLocaleString()} ₽`}
                                         </span>
                                     </div>
-                                    
-                                    {!isPackagingFree && (
-                                        <label className="flex items-center gap-3 cursor-pointer group">
-                                            <input 
-                                                type="checkbox" 
-                                                checked={wantsPackaging} 
-                                                onChange={togglePackaging}
-                                                className="w-4 h-4 border-[#3D2B1F]/20 text-[#3D2B1F] focus:ring-0 rounded-sm"
-                                            />
-                                            <span className="text-[10px] uppercase tracking-widest text-[#3D2B1F]/60 group-hover:text-[#3D2B1F] transition-colors">
-                                                Добавить подарочную упаковку
-                                            </span>
-                                        </label>
-                                    )}
-                                </div>
-
-                                <div className="flex justify-between text-sm">
-                                    <span className="uppercase tracking-widest opacity-60">Доставка</span>
-                                    <span className="text-[10px] uppercase font-bold">Рассчитывается далее</span>
                                 </div>
                                 
                                 <div className="pt-6 border-t border-deep-espresso/10 flex justify-between items-baseline">

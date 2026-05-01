@@ -44,25 +44,27 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
-                <div className="flex items-center gap-6 mb-8">
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-champagne-gold/20">
-                        {user.avatar ? (
-                            <img src={`/storage/${user.avatar}`} alt={user.name} className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-2 font-bold uppercase tracking-tighter">Нет фото</div>
-                        )}
+                {user.is_cosmetologist && (
+                    <div className="flex items-center gap-6 mb-8 animate-fade-in">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-champagne-gold/20">
+                            {user.avatar ? (
+                                <img src={`/storage/${user.avatar}`} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-2 font-bold uppercase tracking-tighter">Нет фото</div>
+                            )}
+                        </div>
+                        <div className="flex-1">
+                            <InputLabel htmlFor="avatar" value="Фотография профиля" />
+                            <input 
+                                id="avatar"
+                                type="file"
+                                onChange={(e) => setData('avatar', e.target.files[0])}
+                                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-creamy-silk file:text-deep-espresso hover:file:bg-champagne-gold/20"
+                            />
+                            <InputError className="mt-2" message={errors.avatar} />
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <InputLabel htmlFor="avatar" value="Фотография профиля" />
-                        <input 
-                            id="avatar"
-                            type="file"
-                            onChange={(e) => setData('avatar', e.target.files[0])}
-                            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-creamy-silk file:text-deep-espresso hover:file:bg-champagne-gold/20"
-                        />
-                        <InputError className="mt-2" message={errors.avatar} />
-                    </div>
-                </div>
+                )}
 
                 <div>
                     <InputLabel htmlFor="name" value="Имя" />

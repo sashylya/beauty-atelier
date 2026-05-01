@@ -28,9 +28,20 @@ class HomeController extends Controller
             })->toArray();
         }
 
-        // 2. Загружаем Хиты продаж (автоматически по количеству заказов)
-        $hitProducts = Product::withSum('orderItems', 'quantity')
-            ->orderBy('order_items_sum_quantity', 'desc')
+        // 2. Загружаем Хиты продаж
+        // Логика: только товары с реальными продажами (quantity > 0), отсортированные по убыванию объема продаж.
+        // Учитываем только заказы, которые не были отменены.
+        $hitProducts = Product::whereHas('orderItems', function($q) {
+                $q->whereHas('order', function($o) {
+                    $o->where('status', '!=', \App\Models\Order::STATUS_CANCELLED);
+                });
+            })
+            ->withSum(['orderItems as total_sales' => function($query) {
+                $query->whereHas('order', function($q) {
+                    $q->where('status', '!=', \App\Models\Order::STATUS_CANCELLED);
+                });
+            }], 'quantity')
+            ->orderBy('total_sales', 'desc')
             ->with('skus')
             ->take(10)
             ->get();

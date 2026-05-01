@@ -62,6 +62,8 @@ export default function Register() {
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
+                                pattern="[a-z0-9._%+-]+@gmail\.com$"
+                                title="Пожалуйста, используйте почту @gmail.com"
                             />
                             {errors.email && <div className="auth-error">{errors.email}</div>}
                         </div>

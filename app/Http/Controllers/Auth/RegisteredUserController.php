@@ -25,13 +25,21 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s\-]+$/u'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'email' => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'email', 
+                'max:255', 
+                'regex:/^[a-z0-9._%+-]+@gmail\.com$/i'
+            ],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
         ], [
             'name.required' => 'Пожалуйста, введите ваше имя.',
             'name.regex' => 'Имя может содержать только буквы, пробелы и дефисы.',
             'email.required' => 'Поле Email обязательно для заполнения.',
             'email.email' => 'Введите корректный адрес электронной почты.',
+            'email.regex' => 'Регистрация возможна только с почтой @gmail.com.',
             'password.required' => 'Поле Пароль не может быть пустым.',
             'password.confirmed' => 'Пароли не совпадают.',
             'password.min' => 'Пароль должен содержать минимум 8 символов.',
