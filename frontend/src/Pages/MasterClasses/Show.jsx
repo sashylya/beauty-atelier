@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 
 export default function Show({ masterClass, auth }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors, reset } = useForm({
         tickets: 1,
     });
+
+    useEffect(() => {
+        if (flash.error) {
+            alert(flash.error);
+        }
+        if (flash.success) {
+            alert(flash.success);
+        }
+    }, [flash.error, flash.success]);
 
     const submit = (e) => {
         e.preventDefault();
@@ -112,39 +122,9 @@ export default function Show({ masterClass, auth }) {
                             <h3 className="font-serif italic text-3xl mb-8">Забронировать место</h3>
                             
                             <form onSubmit={submit} className="space-y-8">
-                                <div>
-                                    <label className="block uppercase tracking-[0.3em] text-[9px] font-bold text-deep-espresso/40 mb-4">
-                                        Количество гостей
-                                    </label>
-                                    <div className="flex items-center border border-deep-espresso/10 p-2">
-                                        <button 
-                                            type="button"
-                                            onClick={() => setData('tickets', Math.max(1, data.tickets - 1))}
-                                            className="w-12 h-12 flex items-center justify-center hover:bg-creamy-silk transition"
-                                        >
-                                            —
-                                        </button>
-                                        <input 
-                                            type="number" 
-                                            value={data.tickets}
-                                            readOnly
-                                            className="flex-1 text-center border-none focus:ring-0 font-serif italic text-xl"
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => setData('tickets', Math.min(masterClass.available_seats, data.tickets + 1))}
-                                            className="w-12 h-12 flex items-center justify-center hover:bg-creamy-silk transition disabled:opacity-20"
-                                            disabled={data.tickets >= masterClass.available_seats}
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                    {errors.tickets && <p className="mt-2 text-[10px] text-red-500 uppercase tracking-widest">{errors.tickets}</p>}
-                                </div>
-
                                 <div className="py-8 border-t border-deep-espresso/5 flex justify-between items-baseline">
                                     <span className="uppercase tracking-[0.3em] text-[10px] font-bold">Итого</span>
-                                    <span className="text-3xl font-light">{(data.tickets * masterClass.price).toLocaleString()} ₽</span>
+                                    <span className="text-3xl font-light">{parseFloat(masterClass.price).toLocaleString()} ₽</span>
                                 </div>
 
                                 {auth.user ? (

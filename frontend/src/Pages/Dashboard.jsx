@@ -62,8 +62,6 @@ export default function Dashboard({ auth, orders, bookings }) {
                                                 <h3 className="font-serif italic text-xl">{booking.master_class.title}</h3>
                                             </div>
                                             <div className="text-right">
-                                                <span className="block text-2xl font-light">{booking.tickets_count}</span>
-                                                <span className="text-[8px] uppercase tracking-widest opacity-40">Билетов</span>
                                             </div>
                                         </div>
                                         

@@ -81,12 +81,12 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                         <div className="flex flex-col justify-center p-10 md:p-16 lg:pl-24 bg-[#FFF5F0]">
                             <p className="uppercase tracking-[0.4em] text-[9px] font-bold text-[#8B5A2B] mb-8">Выбор косметолога</p>
                             <h3 className="font-serif text-5xl lg:text-6xl text-[#4A4A4A] mb-8">{look?.title || 'Образ месяца'}</h3>
-                            <p className="text-sm text-gray-500 leading-7 mb-12 max-w-sm font-light">{look?.description}</p>
+                            <p className="text-sm text-gray-500 leading-7 mb-12 max-w-md font-light">{look?.description}</p>
                             <div className="h-px w-16 bg-[#D4AF37] mb-12"></div>
-                            <div className="w-full max-w-sm space-y-8 mb-12">
+                            <div className="w-full max-w-lg space-y-8 mb-12">
                                 {look?.hotspots?.map((h) => (
-                                    <Link key={h.id} href={h.product_slug ? route('catalog.show', h.product_slug) : '#'} className="flex justify-between items-center group text-[#5D2E18]">
-                                        <span className="uppercase tracking-[0.25em] text-[13px] font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
+                                    <Link key={h.id} href={h.product_slug ? route('catalog.show', h.product_slug) : '#'} className="flex justify-between items-center gap-8 group text-[#5D2E18]">
+                                        <span className="uppercase tracking-[0.25em] text-[11px] lg:text-xs font-medium group-hover:text-[#8B5A2B] transition-colors">{h.label}</span>
                                         <span className="text-[#D4AF37] opacity-60 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300">
                                             <svg width="40" height="10" viewBox="0 0 40 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 5H39M39 5L34 1M39 5L34 9" stroke="currentColor" strokeWidth="0.5"/></svg>
                                         </span>
@@ -123,28 +123,36 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                         ref={sliderRef}
                         className={`flex gap-10 overflow-x-auto hide-scrollbar snap-x snap-mandatory scroll-smooth pb-10 ${hitProducts && hitProducts.length <= 3 ? 'justify-center' : ''}`}
                     >
-                        {hitProducts && hitProducts.map((product) => (
-                            <div key={product.id} className="w-[220px] md:w-[260px] lg:w-[280px] flex-shrink-0 snap-start group">
-                                 <Link href={route('catalog.show', product.slug)} className="block">
-                                    <div className="aspect-[4/5] bg-[#F2F2F2] flex items-center justify-center mb-8 overflow-hidden relative border border-[#3D2B1F]/5 shadow-sm">
-                                        {product.image_path ? (
-                                            <img 
-                                                src={`/storage/${product.image_path}`} 
-                                                alt={product.name} 
-                                                className="w-full h-full object-contain p-0 transition-transform duration-1000 group-hover:scale-110" 
-                                            />
-                                        ) : (
-                                            <div className="font-serif italic text-4xl opacity-5 uppercase tracking-widest">{product.category}</div>
-                                        )}
-                                    </div>
-                                    <div className="text-center px-4">
-                                        <p className="text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] mb-3 font-bold">{product.category}</p>
-                                        <h4 className="font-serif italic text-2xl text-[#3D2B1F] mb-4 transition-colors group-hover:text-[#8B5A2B]">{product.name}</h4>
-                                        <p className="text-[9px] uppercase tracking-widest font-bold text-[#3D2B1F]/30 group-hover:text-[#3D2B1F] transition-colors border-b border-transparent group-hover:border-[#3D2B1F]/10 inline-block pb-1">Посмотреть</p>
-                                    </div>
-                                 </Link>
-                            </div>
-                        ))}
+                        {hitProducts && hitProducts.map((product) => {
+                            const categoryLabels = {
+                                'face': 'Лицо',
+                                'eyes': 'Глаза',
+                                'lips': 'Губы',
+                                'tools': 'Инструменты'
+                            };
+                            return (
+                                <div key={product.id} className="w-[220px] md:w-[260px] lg:w-[280px] flex-shrink-0 snap-start group">
+                                     <Link href={route('catalog.show', product.slug)} className="block">
+                                        <div className="aspect-[4/5] bg-[#F2F2F2] flex items-center justify-center mb-8 overflow-hidden relative border border-[#3D2B1F]/5 shadow-sm">
+                                            {product.image_path ? (
+                                                <img 
+                                                    src={`/storage/${product.image_path}`} 
+                                                    alt={product.name} 
+                                                    className="w-full h-full object-contain p-0 transition-transform duration-1000 group-hover:scale-110" 
+                                                />
+                                            ) : (
+                                                <div className="font-serif italic text-4xl opacity-5 uppercase tracking-widest">{categoryLabels[product.category] || product.category}</div>
+                                            )}
+                                        </div>
+                                        <div className="text-center px-4">
+                                            <p className="text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] mb-3 font-bold">{categoryLabels[product.category] || product.category}</p>
+                                            <h4 className="font-serif italic text-2xl text-[#3D2B1F] mb-4 transition-colors group-hover:text-[#8B5A2B]">{product.name}</h4>
+                                            <p className="text-[9px] uppercase tracking-widest font-bold text-[#3D2B1F]/30 group-hover:text-[#3D2B1F] transition-colors border-b border-transparent group-hover:border-[#3D2B1F]/10 inline-block pb-1">Посмотреть</p>
+                                        </div>
+                                     </Link>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>

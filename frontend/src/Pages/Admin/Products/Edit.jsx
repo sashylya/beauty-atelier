@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react';
 
 export default function Edit({ product }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         name: product.name,
         description: product.description || '',
@@ -14,6 +15,11 @@ export default function Edit({ product }) {
         is_look_of_month: Boolean(product.is_look_of_month),
         _method: 'PATCH',
     });
+
+    useEffect(() => {
+        if (flash.error) alert(flash.error);
+        if (flash.success) alert(flash.success);
+    }, [flash.error, flash.success]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -99,6 +105,22 @@ export default function Edit({ product }) {
                                 accept="image/*"
                             />
                             {errors.image && <div className="text-red-500 text-xs mt-1">{errors.image}</div>}
+
+                            {product.image_path && (
+                                <div className="mt-4 flex items-center gap-3">
+                                    <div className="relative group">
+                                        <img src={`/storage/${product.image_path}`} alt="" className="w-16 h-16 object-cover border border-[#3D2B1F]/10" />
+                                        <button
+                                            type="button"
+                                            onClick={() => confirm('Удалить главное фото?') && router.delete(route('admin.products.remove-main-image', product.id))}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+                                    <span className="text-[9px] uppercase tracking-widest text-[#3D2B1F]/40">Текущее главное</span>
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -114,27 +136,25 @@ export default function Edit({ product }) {
                                 accept="image/*"
                             />
                             {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
+
+                            {product.additional_images && product.additional_images.length > 0 && (
+                                <div className="mt-4 flex flex-wrap gap-3">
+                                    {product.additional_images.map((path, idx) => (
+                                        <div key={idx} className="relative group">
+                                            <img src={`/storage/${path}`} alt="" className="w-12 h-12 object-cover border border-[#3D2B1F]/10" />
+                                            <button
+                                                type="button"
+                                                onClick={() => confirm('Удалить это фото?') && router.delete(route('admin.products.remove-additional-image', product.id), { data: { path } })}
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
-
-                    {product.additional_images && product.additional_images.length > 0 && (
-                        <div className="pt-4">
-                            <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3">
-                                Текущие доп. фото
-                            </label>
-                            <div className="flex flex-wrap gap-4">
-                                {product.additional_images.map((path, idx) => (
-                                    <div key={idx} className="relative group">
-                                        <img 
-                                            src={`/storage/${path}`} 
-                                            alt="" 
-                                            className="w-20 h-20 object-cover border border-[#3D2B1F]/10"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     <div>
                         <label className="block text-[#3D2B1F] text-[10px] uppercase tracking-[0.2em] font-bold mb-3" htmlFor="description">

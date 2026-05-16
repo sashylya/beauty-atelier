@@ -5,6 +5,13 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 export default function Catalog({ products, filters }) {
     const { auth, favoriteProductIds = [] } = usePage().props;
     const [showFilters, setShowFilters] = useState(false);
+
+    const categoryLabels = {
+        'face': 'Лицо',
+        'eyes': 'Глаза',
+        'lips': 'Губы',
+        'tools': 'Инструменты'
+    };
     
     // Проверка, активен ли хоть один фильтр (кроме категории и дефолтной сортировки)
     const hasActiveFilters = filters.min_price || filters.max_price || filters.coverage || filters.finish || (filters.sort && filters.sort !== 'newest');
@@ -257,7 +264,7 @@ export default function Catalog({ products, filters }) {
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <span className="font-serif italic text-neutral-300 text-2xl uppercase tracking-widest">{product.category}</span>
+                                            <span className="font-serif italic text-neutral-300 text-2xl uppercase tracking-widest">{categoryLabels[product.category] || product.category}</span>
                                         )}
                                     </div>
                                     {product.is_hit && (

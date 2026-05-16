@@ -19,6 +19,20 @@ class BookingController extends Controller
             'tickets' => 'required|integer|min:1',
         ]);
 
+        // Проверяем, нет ли уже бронирования у этого пользователя на этот МК
+        $existingBooking = Booking::where('user_id', Auth::id())
+            ->where('master_class_id', $masterClass->id)
+            ->whereIn('status', [Booking::STATUS_PENDING, Booking::STATUS_PAID, Booking::STATUS_CONFIRMED])
+            ->first();
+
+        if ($existingBooking) {
+            $message = $existingBooking->status === Booking::STATUS_PENDING 
+                ? 'У вас уже есть неоплаченное бронирование на этот мастер-класс.' 
+                : 'Вы уже приобрели билет на этот мастер-класс.';
+            
+            return redirect()->back()->with('error', $message);
+        }
+
         if (!$masterClass->hasAvailableSeats($request->tickets)) {
             return redirect()->back()->with('error', 'К сожалению, мест больше нет.');
         }

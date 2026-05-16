@@ -111,6 +111,8 @@ class SkuController extends Controller
                 $additionalPaths[] = $file->store('skus', 'public');
             }
             $validated['additional_images'] = $additionalPaths;
+        } else {
+            unset($validated['additional_images']);
         }
 
         unset($validated['image']);
@@ -118,7 +120,7 @@ class SkuController extends Controller
         $sku->update($validated);
 
         return redirect()->route('admin.products.skus.index', $product->id)
-            ->with('success', 'Sku updated successfully.');
+            ->with('success', 'Оттенок обновлен.');
     }
 
     /**
@@ -128,5 +130,28 @@ class SkuController extends Controller
     {
         $sku->delete();
         return redirect()->back()->with('success', 'Sku deleted successfully.');
+    }
+
+    public function removeMainImage(Product $product, Sku $sku)
+    {
+        if ($sku->image_url) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($sku->image_url);
+            $sku->update(['image_url' => null]);
+        }
+        return redirect()->back()->with('success', 'Главное фото удалено.');
+    }
+
+    public function removeAdditionalImage(Request $request, Product $product, Sku $sku)
+    {
+        $path = $request->input('path');
+        $images = $sku->additional_images ?? [];
+
+        if (($key = array_search($path, $images)) !== false) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            unset($images[$key]);
+            $sku->update(['additional_images' => array_values($images)]);
+        }
+
+        return redirect()->back()->with('success', 'Дополнительное фото удалено.');
     }
 }

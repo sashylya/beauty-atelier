@@ -81,7 +81,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                             <h3 className="font-serif italic text-2xl mb-8">Сумма заказа</h3>
                             <div className="space-y-6 mb-12">
                                 <div className="flex justify-between text-sm">
-                                    <span className="uppercase tracking-widest opacity-60">Подытог</span>
+                                    <span className="uppercase tracking-widest opacity-60">Сумма</span>
                                     <span>{subtotal.toLocaleString()} ₽</span>
                                 </div>
                                 

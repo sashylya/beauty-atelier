@@ -12,6 +12,7 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'product_id',
+        'sku_id',
         'rating',
         'comment',
         'is_approved',
@@ -25,5 +26,10 @@ class Review extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function sku()
+    {
+        return $this->belongsTo(Sku::class);
     }
 }

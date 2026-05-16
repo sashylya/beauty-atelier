@@ -89,7 +89,10 @@ class ProductController extends Controller
             }
         }
 
-        // Сортировка
+        // Сортировка: Сначала в наличии, потом нет
+        $query->orderByRaw('CASE WHEN (SELECT SUM(stock) FROM skus WHERE skus.product_id = products.id) > 0 THEN 0 ELSE 1 END');
+
+        // Сортировка пользователя
         switch ($request->sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -107,6 +110,12 @@ class ProductController extends Controller
 
         $products = $query->get();
 
+        // Динамически определяем "Хиты" на основе продаж
+        $topSellerIds = Product::topSellers(10)->pluck('id')->toArray();
+        $products->each(function ($product) use ($topSellerIds) {
+            $product->is_hit = in_array($product->id, $topSellerIds);
+        });
+
         return Inertia::render('Catalog', [
             'products' => $products,
             'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
@@ -115,8 +124,12 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::with(['skus', 'approvedReviews.user'])->where('slug', $slug)->firstOrFail();
+        $product = Product::with(['skus', 'approvedReviews.user', 'approvedReviews.sku'])->where('slug', $slug)->firstOrFail();
         
+        // Динамически определяем, является ли товар хитом
+        $topSellerIds = Product::topSellers(10)->pluck('id')->toArray();
+        $product->is_hit = in_array($product->id, $topSellerIds);
+
         // Добавляем вычисляемые поля
         $product->append('average_rating');
 

@@ -30,6 +30,27 @@ class Product extends Model
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
+    public function scopeWithTotalSales($query)
+    {
+        return $query->withSum(['orderItems as total_sales' => function ($query) {
+            $query->whereHas('order', function ($q) {
+                $q->where('status', '!=', Order::STATUS_CANCELLED);
+            });
+        }], 'quantity');
+    }
+
+    public function scopeTopSellers($query, $limit = 10)
+    {
+        return $query->whereHas('orderItems', function ($q) {
+            $q->whereHas('order', function ($o) {
+                $o->where('status', '!=', Order::STATUS_CANCELLED);
+            });
+        })
+            ->withTotalSales()
+            ->orderBy('total_sales', 'desc')
+            ->take($limit);
+    }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);

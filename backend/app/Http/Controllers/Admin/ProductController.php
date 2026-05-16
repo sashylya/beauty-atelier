@@ -53,21 +53,23 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('additional_images')) {
-            $additionalPaths = [];
+            $additionalPaths = $product->additional_images ?? [];
             foreach ($request->file('additional_images') as $file) {
                 $additionalPaths[] = $file->store('products', 'public');
             }
             $validated['additional_images'] = $additionalPaths;
+        } else {
+            // Предотвращаем затирание существующих фото пустым массивом из валидации
+            unset($validated['additional_images']);
         }
 
         unset($validated['image']);
-        unset($validated['additional_images_files']); // Cleanup if sent
 
         if (isset($validated['price'])) {
             $validated['price'] = round($validated['price']);
         }
 
-        Product::create($validated);
+        $product->update($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
     }
@@ -113,6 +115,8 @@ class ProductController extends Controller
                 $additionalPaths[] = $file->store('products', 'public');
             }
             $validated['additional_images'] = $additionalPaths;
+        } else {
+            unset($validated['additional_images']);
         }
 
         unset($validated['image']);
@@ -123,7 +127,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Товар обновлен.');
     }
 
     /**
@@ -133,5 +137,28 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+    }
+
+    public function removeMainImage(Product $product)
+    {
+        if ($product->image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image_path);
+            $product->update(['image_path' => null]);
+        }
+        return redirect()->back()->with('success', 'Главное фото удалено.');
+    }
+
+    public function removeAdditionalImage(Request $request, Product $product)
+    {
+        $path = $request->input('path');
+        $images = $product->additional_images ?? [];
+
+        if (($key = array_search($path, $images)) !== false) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            unset($images[$key]);
+            $product->update(['additional_images' => array_values($images)]);
+        }
+
+        return redirect()->back()->with('success', 'Дополнительное фото удалено.');
     }
 }

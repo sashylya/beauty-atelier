@@ -30,7 +30,7 @@ export default function Ticket({ booking, qrCodeUrl }) {
                             </h1>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 gap-8">
                             <div>
                                 <p className="text-[10px] uppercase tracking-widest opacity-40 mb-2">Дата и время</p>
                                 <p className="font-medium text-sm">
@@ -42,10 +42,6 @@ export default function Ticket({ booking, qrCodeUrl }) {
                                         minute: '2-digit'
                                     })}
                                 </p>
-                            </div>
-                            <div>
-                                <p className="text-[10px] uppercase tracking-widest opacity-40 mb-2">Количество мест</p>
-                                <p className="font-medium text-sm">{booking.tickets_count}</p>
                             </div>
                         </div>
 

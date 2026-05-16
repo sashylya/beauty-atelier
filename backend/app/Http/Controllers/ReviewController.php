@@ -14,11 +14,13 @@ class ReviewController extends Controller
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|min:5|max:1000',
+            'sku_id' => 'nullable|exists:skus,id',
         ]);
 
         Review::create([
             'user_id' => Auth::id(),
             'product_id' => $product->id,
+            'sku_id' => $request->sku_id,
             'rating' => $request->rating,
             'comment' => $request->comment,
             'is_approved' => false, // Requires moderation

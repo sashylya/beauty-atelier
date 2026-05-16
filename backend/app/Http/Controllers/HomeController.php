@@ -29,21 +29,9 @@ class HomeController extends Controller
         }
 
         // 2. Загружаем Хиты продаж
-        // Логика: только товары с реальными продажами (quantity > 0), отсортированные по убыванию объема продаж.
-        // Учитываем только заказы, которые не были отменены.
-        $hitProducts = Product::whereHas('orderItems', function($q) {
-                $q->whereHas('order', function($o) {
-                    $o->where('status', '!=', \App\Models\Order::STATUS_CANCELLED);
-                });
-            })
-            ->withSum(['orderItems as total_sales' => function($query) {
-                $query->whereHas('order', function($q) {
-                    $q->where('status', '!=', \App\Models\Order::STATUS_CANCELLED);
-                });
-            }], 'quantity')
-            ->orderBy('total_sales', 'desc')
+        // Логика вынесена в scope модели Product
+        $hitProducts = Product::topSellers(10)
             ->with('skus')
-            ->take(10)
             ->get();
 
         // 3. Загружаем последние статьи для блока "Дневник Ателье"

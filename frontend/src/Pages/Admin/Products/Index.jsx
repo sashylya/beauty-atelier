@@ -18,6 +18,13 @@ export default function Index({ products }) {
         return label;
     };
 
+    const categoryLabels = {
+        'face': 'Лицо',
+        'eyes': 'Глаза',
+        'lips': 'Губы',
+        'tools': 'Инструменты'
+    };
+
     return (
         <AdminLayout>
             <Head title="Товары" />
@@ -65,7 +72,7 @@ export default function Index({ products }) {
                                 </td>
                                 <td className="py-4 px-6 text-center">
                                     <span className="inline-block border border-[#D4AF37]/30 text-[#8B5A2B] px-3 py-1 text-[9px] uppercase tracking-widest rounded-full font-medium">
-                                        {product.category}
+                                        {categoryLabels[product.category] || product.category}
                                     </span>
                                 </td>
                                 <td className="py-4 px-6 text-center font-serif italic text-[#3D2B1F]">

@@ -11,7 +11,7 @@ class ReviewController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Review::with(['user', 'product'])->latest();
+        $query = Review::with(['user', 'product', 'sku'])->latest();
 
         if ($request->filled('status')) {
             if ($request->status === 'approved') {

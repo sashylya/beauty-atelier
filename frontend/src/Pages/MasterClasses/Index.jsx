@@ -51,7 +51,7 @@ export default function Index({ masterClasses }) {
                                     <div className="space-y-8">
                                         <div className="flex items-center space-x-12 border-t border-deep-espresso/10 pt-10">
                                             <div>
-                                                <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Цена за гостя</p>
+                                                <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Цена</p>
                                                 <p className="text-2xl font-light tracking-tight">{mc.price.toLocaleString()} ₽</p>
                                             </div>
                                             <div>

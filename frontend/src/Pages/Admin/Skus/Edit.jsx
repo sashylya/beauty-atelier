@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router, usePage } from '@inertiajs/react';
 
 export default function Edit({ product, sku }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         shade_name: sku.shade_name,
         color_hex: sku.color_hex || '#3D2B1F',
@@ -16,6 +17,11 @@ export default function Edit({ product, sku }) {
         durability: sku.durability || '',
         _method: 'PATCH',
     });
+
+    useEffect(() => {
+        if (flash.error) alert(flash.error);
+        if (flash.success) alert(flash.success);
+    }, [flash.error, flash.success]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -131,8 +137,17 @@ export default function Edit({ product, sku }) {
                                 
                                 {sku.image_url && (
                                     <div className="mt-4 flex items-center gap-3">
-                                        <span className="text-[9px] uppercase tracking-widest text-[#3D2B1F]/40">Текущее главное:</span>
-                                        <img src={`/storage/${sku.image_url}`} alt="" className="w-12 h-12 object-cover border border-[#3D2B1F]/10" />
+                                        <div className="relative group">
+                                            <img src={`/storage/${sku.image_url}`} alt="" className="w-16 h-16 object-cover border border-[#3D2B1F]/10" />
+                                            <button
+                                                type="button"
+                                                onClick={() => confirm('Удалить главное фото?') && router.delete(route('admin.products.skus.remove-main-image', [product.id, sku.id]))}
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <span className="text-[9px] uppercase tracking-widest text-[#3D2B1F]/40">Текущее главное</span>
                                     </div>
                                 )}
                             </div>
@@ -152,9 +167,18 @@ export default function Edit({ product, sku }) {
                                 {errors['additional_images.0'] && <div className="text-red-500 text-xs mt-1">Ошибка в файлах</div>}
 
                                 {sku.additional_images && sku.additional_images.length > 0 && (
-                                    <div className="mt-4 flex flex-wrap gap-2">
+                                    <div className="mt-4 flex flex-wrap gap-3">
                                         {sku.additional_images.map((path, idx) => (
-                                            <img key={idx} src={`/storage/${path}`} alt="" className="w-10 h-10 object-cover border border-[#3D2B1F]/10" />
+                                            <div key={idx} className="relative group">
+                                                <img src={`/storage/${path}`} alt="" className="w-12 h-12 object-cover border border-[#3D2B1F]/10" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => confirm('Удалить это фото?') && router.delete(route('admin.products.skus.remove-additional-image', [product.id, sku.id]), { data: { path } })}
+                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
                                         ))}
                                     </div>
                                 )}

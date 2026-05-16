@@ -1,0 +1,11 @@
+backend/vendor
+backend/node_modules
+frontend/node_modules
+frontend/dist
+backend/public/build
+backend/storage/*.key
+backend/.env
+.git
+.gitignore
+docker
+docker-compose.yml

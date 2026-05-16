@@ -266,19 +266,21 @@
 }
 
 .btn-toggle-danger {
-    background-color: #ef4444;
-    color: white;
+    background-color: #FDE8E8;
+    color: #9B1C1C;
+    border: none;
 }
 
 .btn-toggle-danger:hover {
-    background-color: #dc2626;
+    background-color: #FBD5D5;
 }
 
 .btn-toggle-success {
-    background-color: #10b981;
-    color: white;
+    background-color: #DEF7EC;
+    color: #03543F;
+    border: none;
 }
 
 .btn-toggle-success:hover {
-    background-color: #059669;
+    background-color: #BCF0DA;
 }

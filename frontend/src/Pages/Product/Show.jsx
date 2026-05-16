@@ -22,20 +22,26 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
     const [isComparing, setIsComparing] = useState(false);
     const [activeImage, setActiveImage] = useState(null);
 
-    // Собираем все изображения
-    const allImages = [
+    // Собираем изображения: SKU-специфичные + общие фото товара
+    const skuImages = [
         selectedSku.image_url ? `/storage/${selectedSku.image_url}` : null,
-        ...(selectedSku.additional_images || []).map(path => `/storage/${path}`),
+        ...(selectedSku.additional_images || []).map(path => `/storage/${path}`)
+    ].filter(Boolean);
+
+    const productImages = [
         product.image_path ? `/storage/${product.image_path}` : null,
         ...(product.additional_images || []).map(path => `/storage/${path}`)
-    ].filter((img, index, self) => img !== null && self.indexOf(img) === index);
+    ].filter(Boolean);
+
+    // Объединяем, убирая дубликаты. SKU-фото в начале.
+    const allImages = [...skuImages, ...productImages].filter((img, index, self) => self.indexOf(img) === index);
 
     // Обновляем активное изображение при смене SKU
     React.useEffect(() => {
-        if (selectedSku.image_url) {
-            setActiveImage(`/storage/${selectedSku.image_url}`);
-        } else if (!activeImage && product.image_path) {
-            setActiveImage(`/storage/${product.image_path}`);
+        if (skuImages.length > 0) {
+            setActiveImage(skuImages[0]);
+        } else if (productImages.length > 0) {
+            setActiveImage(productImages[0]);
         }
     }, [selectedSku]);
 
@@ -76,7 +82,13 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
     const { data: reviewData, setData: setReviewData, post: postReview, processing: processingReview, reset: resetReview, errors: reviewErrors } = useForm({
         rating: 5,
         comment: '',
+        sku_id: selectedSku?.id || null,
     });
+
+    // Update sku_id in form when selectedSku changes
+    React.useEffect(() => {
+        setReviewData('sku_id', selectedSku?.id || null);
+    }, [selectedSku]);
 
     const submitReview = (e) => {
         e.preventDefault();
@@ -86,16 +98,23 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
         });
     };
 
+    const categoryLabels = {
+        'face': 'Лицо',
+        'eyes': 'Глаза',
+        'lips': 'Губы',
+        'tools': 'Инструменты'
+    };
+
     return (
         <BeautyLayout>
             <Head title={`${product.name} — Beauty Atelier`} />
             
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
                     
                     {/* Left: Sticky Image Gallery */}
-                    <div className="lg:col-span-7 space-y-12">
-                        <div className="aspect-[4/5] bg-white flex items-center justify-center relative overflow-hidden group">
+                    <div className="lg:col-span-6 space-y-8">
+                        <div className="aspect-[4/5] bg-white flex items-center justify-center relative overflow-hidden group max-w-[500px] mx-auto">
                              <div 
                                 className="absolute inset-0 transition-all duration-1000 ease-in-out"
                                 style={{ backgroundColor: `${selectedSku.color_hex}08` }}
@@ -113,7 +132,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                             )}
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <span className="font-serif italic text-sm lg:text-xl text-[#3D2B1F] bg-white/90 backdrop-blur-sm px-6 py-3 shadow-lg uppercase tracking-widest border border-[#3D2B1F]/5">{selectedSku.shade_name}</span>
+                                            <span className="font-serif italic text-xs lg:text-sm text-[#3D2B1F] bg-white/90 backdrop-blur-sm px-4 py-2 shadow-lg uppercase tracking-widest border border-[#3D2B1F]/5">{selectedSku.shade_name}</span>
                                         </div>
                                     </div>
                                     <div className="w-1/2 h-full relative overflow-hidden">
@@ -125,17 +144,23 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                             )}
                                         </div>
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <span className="font-serif italic text-sm lg:text-xl text-[#3D2B1F] bg-white/90 backdrop-blur-sm px-6 py-3 shadow-lg uppercase tracking-widest border border-[#3D2B1F]/5">{comparisonSku.shade_name}</span>
+                                            <span className="font-serif italic text-xs lg:text-sm text-[#3D2B1F] bg-white/90 backdrop-blur-sm px-4 py-2 shadow-lg uppercase tracking-widest border border-[#3D2B1F]/5">{comparisonSku.shade_name}</span>
                                         </div>
                                     </div>
-                                    <button onClick={() => setIsComparing(false)} className="absolute top-6 right-6 z-30 bg-[#3D2B1F] text-white w-10 h-10 rounded-full flex items-center justify-center text-sm hover:scale-110 transition-transform shadow-xl">✕</button>
+                                    <button onClick={() => setIsComparing(false)} className="absolute top-4 right-4 z-30 bg-[#3D2B1F] text-white w-8 h-8 rounded-full flex items-center justify-center text-xs hover:scale-110 transition-transform shadow-xl">✕</button>
                                 </div>
                              )}
 
                              {/* Decorative Text */}
                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-                                <span className="font-serif italic text-[20vw] lg:text-[12vw] text-deep-espresso/[0.03] uppercase tracking-tighter leading-none whitespace-nowrap transition-transform duration-1000 group-hover:scale-110">Ателье</span>
+                                <span className="font-serif italic text-[15vw] lg:text-[10vw] text-deep-espresso/[0.03] uppercase tracking-tighter leading-none whitespace-nowrap transition-transform duration-1000 group-hover:scale-110">Ателье</span>
                              </div>
+
+                             {product.is_hit && (
+                                <div className="absolute top-6 left-6 z-20 bg-champagne-gold/90 backdrop-blur-sm text-creamy-silk text-[8px] uppercase tracking-[0.3em] px-4 py-2 font-bold shadow-xl animate-fade-in">
+                                    Хит продаж
+                                </div>
+                             )}
 
                              {/* Main Visual */}
                              <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
@@ -151,12 +176,12 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
 
                         {/* Thumbnails */}
                         {allImages.length > 1 && (
-                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide justify-center">
                                 {allImages.map((img, idx) => (
                                     <button 
                                         key={idx} 
                                         onClick={() => setActiveImage(img)}
-                                        className={`w-24 h-24 flex-shrink-0 border-2 transition-all duration-300 ${activeImage === img ? 'border-[#3D2B1F]' : 'border-transparent hover:border-[#3D2B1F]/20'}`}
+                                        className={`w-16 h-16 flex-shrink-0 border-2 transition-all duration-300 ${activeImage === img ? 'border-[#3D2B1F]' : 'border-transparent hover:border-[#3D2B1F]/20'}`}
                                     >
                                         <img src={img} alt="" className="w-full h-full object-cover" />
                                     </button>
@@ -166,52 +191,52 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                     </div>
 
                     {/* Right: Details */}
-                    <div className="lg:col-span-5 lg:sticky lg:top-40">
+                    <div className="lg:col-span-6 lg:sticky lg:top-32">
                         <Link 
                             href={route('catalog.index')}
-                            className="inline-flex items-center gap-2 uppercase tracking-[0.3em] text-[10px] font-bold text-deep-espresso/40 hover:text-champagne-gold transition mb-12 group"
+                            className="inline-flex items-center gap-2 uppercase tracking-[0.3em] text-[9px] font-bold text-deep-espresso/40 hover:text-champagne-gold transition mb-8 group"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-2.5 h-2.5 transition-transform group-hover:-translate-x-1">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                             </svg>
                             Назад в каталог
                         </Link>
 
-                        <div className="mb-12">
-                            <nav className="flex space-x-4 uppercase tracking-[0.3em] text-[8px] font-bold text-deep-espresso/40 mb-8">
+                        <div className="mb-8">
+                            <nav className="flex space-x-3 uppercase tracking-[0.3em] text-[7px] font-bold text-deep-espresso/40 mb-6">
                                 <Link href={route('catalog.index')} className="hover:text-deep-espresso transition">Коллекция</Link>
                                 <span>/</span>
-                                <span className="text-champagne-gold uppercase">{product.category}</span>
+                                <span className="text-champagne-gold uppercase">{categoryLabels[product.category] || product.category}</span>
                             </nav>
-                            <h1 className="font-serif italic text-5xl lg:text-6xl text-deep-espresso mb-8 leading-tight">{product.name}</h1>
-                            <div className="flex items-center space-x-6 mb-12">
-                                <span className="text-3xl font-light tracking-tight text-deep-espresso">{parseFloat(selectedSku.price || product.price || 0).toLocaleString()} ₽</span>
+                            <h1 className="font-serif italic text-4xl lg:text-5xl text-deep-espresso mb-6 leading-tight">{product.name}</h1>
+                            <div className="flex items-center space-x-4 mb-8">
+                                <span className="text-2xl font-light tracking-tight text-deep-espresso">{parseFloat(selectedSku.price || product.price || 0).toLocaleString()} ₽</span>
                                 {averageRating > 0 && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5">
                                         <div className="flex text-champagne-gold">
                                             {[...Array(5)].map((_, i) => (
-                                                <svg key={i} className={`w-4 h-4 ${i < Math.round(averageRating) ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                                                <svg key={i} className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
                                                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                                 </svg>
                                             ))}
                                         </div>
-                                        <span className="text-sm font-serif italic text-deep-espresso/60">{averageRating} / 5</span>
+                                        <span className="text-[12px] font-serif italic text-deep-espresso/60">{averageRating} / 5</span>
                                     </div>
                                 )}
                             </div>
-                            <p className="text-deep-espresso/70 leading-relaxed mb-12 text-sm lg:text-base">{product.description}</p>
+                            <p className="text-deep-espresso/70 leading-relaxed mb-8 text-xs lg:text-sm">{product.description}</p>
                         </div>
 
                         {/* Shade Selection */}
                         {product.skus.length > 0 && (
-                            <div className="mb-16">
-                                <div className="flex justify-between items-end mb-6">
-                                    <p className="uppercase tracking-[0.2em] text-[10px] font-bold">Выбранный оттенок</p>
-                                    <span className="font-serif italic text-sm text-deep-espresso/60">{selectedSku.shade_name}</span>
+                            <div className="mb-10">
+                                <div className="flex justify-between items-end mb-4">
+                                    <p className="uppercase tracking-[0.2em] text-[9px] font-bold">Выбранный оттенок</p>
+                                    <span className="font-serif italic text-xs text-deep-espresso/60">{selectedSku.shade_name}</span>
                                 </div>
-                                <div className="flex flex-wrap gap-4">
+                                <div className="flex flex-wrap gap-3">
                                     {product.skus.map((sku) => (
-                                        <button key={sku.id} onClick={() => setSelectedSku(sku)} className={`group relative w-12 h-12 rounded-full transition-all duration-500 ease-out ${selectedSku.id === sku.id ? 'ring-2 ring-deep-espresso ring-offset-4 ring-offset-creamy-silk' : 'hover:ring-1 hover:ring-deep-espresso/20 hover:ring-offset-2 hover:ring-offset-creamy-silk'}`}>
+                                        <button key={sku.id} onClick={() => setSelectedSku(sku)} className={`group relative w-10 h-10 rounded-full transition-all duration-500 ease-out ${selectedSku.id === sku.id ? 'ring-2 ring-deep-espresso ring-offset-4 ring-offset-creamy-silk' : 'hover:ring-1 hover:ring-deep-espresso/20 hover:ring-offset-2 hover:ring-offset-creamy-silk'}`}>
                                             <div className="w-full h-full rounded-full shadow-inner transition-transform duration-500 group-hover:scale-90" style={{ backgroundColor: sku.color_hex }}></div>
                                         </button>
                                     ))}
@@ -220,31 +245,31 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                         )}
 
                         {/* Attributes */}
-                        <div className="grid grid-cols-2 gap-12 mb-16 border-y border-deep-espresso/10 py-10">
-                            <div className="space-y-2">
-                                <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30">Покрытие</p>
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-bold">{selectedSku.coverage}</p>
+                        <div className="grid grid-cols-2 gap-8 mb-10 border-y border-deep-espresso/10 py-8">
+                            <div className="space-y-1">
+                                <p className="uppercase tracking-[0.3em] text-[7px] font-black text-deep-espresso/30">Покрытие</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">{selectedSku.coverage}</p>
                             </div>
-                            <div className="space-y-2">
-                                <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30">Финиш</p>
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-bold">{selectedSku.finish}</p>
+                            <div className="space-y-1">
+                                <p className="uppercase tracking-[0.3em] text-[7px] font-black text-deep-espresso/30">Финиш</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">{selectedSku.finish}</p>
                             </div>
-                            <div className="space-y-2">
-                                <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30">Дресс-код</p>
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-champagne-gold">{selectedSku.dress_code}</p>
+                            <div className="space-y-1">
+                                <p className="uppercase tracking-[0.3em] text-[7px] font-black text-deep-espresso/30">Дресс-код</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-champagne-gold">{selectedSku.dress_code}</p>
                             </div>
-                            <div className="space-y-2">
-                                <p className="uppercase tracking-[0.3em] text-[8px] font-black text-deep-espresso/30">Наличие</p>
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-bold">{(selectedSku.stock > 0 || !selectedSku.id) ? 'В наличии' : 'Нет в наличии'}</p>
+                            <div className="space-y-1">
+                                <p className="uppercase tracking-[0.3em] text-[7px] font-black text-deep-espresso/30">Наличие</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">{(selectedSku.stock > 0 || !selectedSku.id) ? 'В наличии' : 'Нет в наличии'}</p>
                             </div>
                         </div>
 
                         {/* Actions */}
-                        <div className="flex gap-4 mb-4">
+                        <div className="flex gap-3 mb-3">
                             <button 
                                 onClick={addToCart}
                                 disabled={processing || product.skus.length === 0 || (selectedSku.id && selectedSku.stock <= 0)}
-                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-2xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[10px] font-bold py-5 hover:bg-black transition-all duration-500 shadow-xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {product.skus.length === 0 
                                     ? 'Нет в наличии' 
@@ -255,7 +280,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                             
                             <button 
                                 onClick={toggleWishlist}
-                                className={`w-20 border border-deep-espresso flex items-center justify-center transition-all duration-500 hover:bg-[#FDF5E6] ${isFavorited ? 'bg-[#FDF5E6]' : ''}`}
+                                className={`w-16 border border-deep-espresso flex items-center justify-center transition-all duration-500 hover:bg-[#FDF5E6] ${isFavorited ? 'bg-[#FDF5E6]' : ''}`}
                             >
                                 <svg 
                                     xmlns="http://www.w3.org/2000/svg" 
@@ -263,7 +288,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                     viewBox="0 0 24 24" 
                                     strokeWidth={1.5} 
                                     stroke={isFavorited ? "#D4AF37" : "currentColor"} 
-                                    className="w-6 h-6"
+                                    className="w-5 h-5"
                                 >
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                                 </svg>
@@ -281,30 +306,30 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                         if (other) setComparisonSku(other);
                                     }
                                 }}
-                                className={`w-full border border-deep-espresso uppercase tracking-[0.4em] text-[11px] font-bold py-6 transition-all duration-500 mb-12 ${
+                                className={`w-full border border-deep-espresso uppercase tracking-[0.4em] text-[10px] font-bold py-5 transition-all duration-500 mb-8 ${
                                     isComparing ? 'bg-champagne-gold text-white border-champagne-gold' : 'text-deep-espresso hover:bg-deep-espresso hover:text-creamy-silk'
                                 }`}
                             >
-                                {isComparing ? 'Закрыть примерку' : 'Виртуальная примерка'}
+                                {isComparing ? 'Закрыть сравнение' : 'Сравнить оттенки'}
                             </button>
                         )}
                         
                         {/* Info Accordion */}
-                        <div className="mt-16 space-y-4">
-                            <details className="group border-b border-deep-espresso/10 pb-6 cursor-pointer">
-                                <summary className="list-none flex justify-between items-center uppercase tracking-[0.2em] text-[10px] font-bold group-open:text-champagne-gold transition-colors">Состав<span className="text-lg group-open:rotate-45 transition-transform duration-300 font-light">+</span></summary>
-                                <div className="mt-6 text-[13px] text-deep-espresso/60 leading-relaxed font-light whitespace-pre-line">{product.composition || 'Состав уточняется у производителя.'}</div>
+                        <div className="mt-12 space-y-3">
+                            <details className="group border-b border-deep-espresso/10 pb-4 cursor-pointer">
+                                <summary className="list-none flex justify-between items-center uppercase tracking-[0.2em] text-[9px] font-bold group-open:text-champagne-gold transition-colors">Состав<span className="text-lg group-open:rotate-45 transition-transform duration-300 font-light">+</span></summary>
+                                <div className="mt-4 text-[12px] text-deep-espresso/60 leading-relaxed font-light whitespace-pre-line">{product.composition || 'Состав уточняется у производителя.'}</div>
                             </details>
-                            <details className="group border-b border-deep-espresso/10 pb-6 cursor-pointer">
-                                <summary className="list-none flex justify-between items-center uppercase tracking-[0.2em] text-[10px] font-bold group-open:text-champagne-gold transition-colors">Доставка<span className="text-lg group-open:rotate-45 transition-transform duration-300 font-light">+</span></summary>
-                                <div className="mt-6 text-[13px] text-deep-espresso/60 leading-relaxed font-light">Бесплатная доставка при заказе от 2 000 ₽. <br/>При заказе до 2 000 ₽ стоимость доставки — 200 ₽. <br/>Доставка в течение 2-3 рабочих дней по Москве.</div>
+                            <details className="group border-b border-deep-espresso/10 pb-4 cursor-pointer">
+                                <summary className="list-none flex justify-between items-center uppercase tracking-[0.2em] text-[9px] font-bold group-open:text-champagne-gold transition-colors">Доставка<span className="text-lg group-open:rotate-45 transition-transform duration-300 font-light">+</span></summary>
+                                <div className="mt-4 text-[12px] text-deep-espresso/60 leading-relaxed font-light">Бесплатная доставка при заказе от 2 000 ₽. <br/>При заказе до 2 000 ₽ стоимость доставки — 200 ₽. <br/>Доставка в течение 2-3 рабочих дней по Москве.</div>
                             </details>
                         </div>
                     </div>
                 </div>
 
                 {/* Reviews Section */}
-                <div className="mt-32 pt-20 border-t border-deep-espresso/10">
+                <div className="mt-20 pt-16 border-t border-deep-espresso/10">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                         <div className="lg:col-span-4">
                             <h2 className="font-serif italic text-4xl text-deep-espresso mb-8">Отзывы</h2>
@@ -335,6 +360,30 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                             ))}
                                         </div>
                                     </div>
+
+                                    {product.skus.length > 0 && (
+                                        <div>
+                                            <label className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Выберите оттенок</label>
+                                            <select
+                                                value={reviewData.sku_id}
+                                                onChange={(e) => setReviewData('sku_id', e.target.value)}
+                                                className="w-full bg-white border border-deep-espresso/10 p-4 text-[11px] uppercase tracking-widest font-bold focus:ring-1 focus:ring-champagne-gold focus:border-champagne-gold outline-none appearance-none cursor-pointer"
+                                                style={{
+                                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%233D2B1F' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
+                                                    backgroundRepeat: 'no-repeat',
+                                                    backgroundPosition: 'right 1rem center',
+                                                    backgroundSize: '1em'
+                                                }}
+                                            >
+                                                <option value="">Без привязки к оттенку</option>
+                                                {product.skus.map((sku) => (
+                                                    <option key={sku.id} value={sku.id}>
+                                                        {sku.shade_name} {sku.id === selectedSku?.id ? '(текущий)' : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
 
                                     <div>
                                         <label className="block uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Ваш отзыв</label>
@@ -372,6 +421,12 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                             <div className="flex justify-between items-start mb-4">
                                                 <div>
                                                     <p className="font-serif italic text-xl text-deep-espresso">{review.user.name}</p>
+                                                    {review.sku && (
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <div className="w-2.5 h-2.5 rounded-full shadow-inner" style={{ backgroundColor: review.sku.color_hex }}></div>
+                                                            <span className="text-[10px] uppercase tracking-wider text-deep-espresso/40">Оттенок: {review.sku.shade_name}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex text-champagne-gold mt-1">
                                                         {[...Array(5)].map((_, i) => (
                                                             <svg key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
@@ -384,7 +439,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                                     {new Date(review.created_at).toLocaleDateString('ru-RU')}
                                                 </span>
                                             </div>
-                                            <p className="text-deep-espresso/70 leading-relaxed text-sm lg:text-base italic">"{review.comment}"</p>
+                                            <p className="text-deep-espresso/70 leading-relaxed text-sm lg:text-base italic break-words overflow-hidden">"{review.comment}"</p>
                                         </div>
                                     ))}
                                 </div>

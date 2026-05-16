@@ -122,7 +122,7 @@ export default function Index({ items, total, subtotal, deliveryFee, isDeliveryF
 
                             <div className="space-y-4 pt-8 border-t border-deep-espresso/10 mb-8">
                                 <div className="flex justify-between text-[11px] uppercase tracking-widest">
-                                    <span className="opacity-40">Подытог</span>
+                                    <span className="opacity-40">Сумма</span>
                                     <span>{subtotal.toLocaleString()} ₽</span>
                                 </div>
                                 <div className="flex justify-between text-[11px] uppercase tracking-widest">

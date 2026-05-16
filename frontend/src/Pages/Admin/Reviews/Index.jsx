@@ -41,44 +41,54 @@ export default function Index({ reviews, filters }) {
                 </div>
             </div>
 
-            <div className="bg-white shadow-sm border border-[#3D2B1F]/5 overflow-hidden">
-                <table className="min-w-full text-left">
+            <div className="bg-white shadow-sm border border-[#3D2B1F]/5 overflow-hidden rounded-sm">
+                <table className="w-full text-left table-fixed border-collapse">
                     <thead>
-                        <tr className="border-b border-[#3D2B1F]/10">
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Дата</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Пользователь</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Товар</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Оценка</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60">Комментарий</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Статус</th>
-                            <th className="py-6 px-6 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center">Действия</th>
+                        <tr className="border-b border-[#3D2B1F]/10 bg-[#FDF5E6]/10">
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 w-[80px]">Дата</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 w-[100px]">Пользователь</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 w-[120px]">Товар</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 w-[100px]">Оттенок</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center w-[80px]">Оценка</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 w-auto">Комментарий</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center w-[90px]">Статус</th>
+                            <th className="py-6 px-4 text-[9px] uppercase tracking-[0.2em] font-medium text-[#3D2B1F]/60 text-center w-[100px]">Действия</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-[#3D2B1F]/5">
                         {reviews.data.map((review) => (
                             <tr key={review.id} className="hover:bg-[#FDF5E6]/30 transition-colors group">
-                                <td className="py-4 px-6 text-xs text-[#3D2B1F]/60">
+                                <td className="py-4 px-4 text-[10px] text-[#3D2B1F]/60">
                                     {new Date(review.created_at).toLocaleDateString('ru-RU')}
                                 </td>
-                                <td className="py-4 px-6 font-medium text-[#3D2B1F] text-sm">
+                                <td className="py-4 px-4 font-medium text-[#3D2B1F] text-[11px] truncate" title={review.user?.name}>
                                     {review.user?.name || 'Удален'}
                                 </td>
-                                <td className="py-4 px-6 text-sm text-[#3D2B1F]">
+                                <td className="py-4 px-4 text-[11px] text-[#3D2B1F] truncate" title={review.product?.name}>
                                     {review.product?.name || 'Удален'}
                                 </td>
-                                <td className="py-4 px-6 text-center">
+                                <td className="py-4 px-4">
+                                    {review.sku ? (
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <div className="w-2 h-2 rounded-full border border-[#3D2B1F]/10 flex-shrink-0" style={{ backgroundColor: review.sku.color_hex }}></div>
+                                            <span className="text-[9px] uppercase tracking-wider text-[#3D2B1F]/60 truncate" title={review.sku.shade_name}>{review.sku.shade_name}</span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-[10px] uppercase tracking-wider text-[#3D2B1F]/30">—</span>
+                                    )}
+                                </td>
+                                <td className="py-4 px-4 text-center">
                                     <div className="flex justify-center text-champagne-gold">
                                         {[...Array(5)].map((_, i) => (
-                                            <svg key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
+                                            <svg key={i} className={`w-2.5 h-2.5 ${i < review.rating ? 'fill-current' : 'fill-none stroke-current'}`} viewBox="0 0 24 24">
                                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                             </svg>
                                         ))}
                                     </div>
                                 </td>
-                                <td className="py-4 px-6 text-xs text-[#3D2B1F]/80 max-w-xs truncate" title={review.comment}>
+                                <td className="py-4 px-4 text-[11px] text-[#3D2B1F]/80 leading-relaxed break-words">
                                     {review.comment}
-                                </td>
-                                <td className="py-4 px-6 text-center">
+                                </td>                                <td className="py-4 px-6 text-center">
                                     {review.is_approved ? (
                                         <span className="text-green-600 text-[9px] uppercase tracking-widest font-bold">Одобрен</span>
                                     ) : (

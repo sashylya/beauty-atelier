@@ -99,7 +99,11 @@ Route::middleware(['auth', 'cosmetologist'])->prefix('cosmetologist')->name('cos
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::delete('products/{product}/main-image', [\App\Http\Controllers\Admin\ProductController::class, 'removeMainImage'])->name('products.remove-main-image');
+    Route::delete('products/{product}/additional-image', [\App\Http\Controllers\Admin\ProductController::class, 'removeAdditionalImage'])->name('products.remove-additional-image');
     Route::resource('products.skus', \App\Http\Controllers\Admin\SkuController::class)->except(['show']);
+    Route::delete('products/{product}/skus/{sku}/main-image', [\App\Http\Controllers\Admin\SkuController::class, 'removeMainImage'])->name('products.skus.remove-main-image');
+    Route::delete('products/{product}/skus/{sku}/additional-image', [\App\Http\Controllers\Admin\SkuController::class, 'removeAdditionalImage'])->name('products.skus.remove-additional-image');
     
     Route::get('/look', [\App\Http\Controllers\Admin\LookController::class, 'edit'])->name('look.edit');
     Route::post('/look', [\App\Http\Controllers\Admin\LookController::class, 'update'])->name('look.update');
