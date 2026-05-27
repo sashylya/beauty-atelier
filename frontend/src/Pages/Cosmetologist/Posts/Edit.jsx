@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 export default function Edit({ post, products }) {
+    const [searchQuery, setSearchQuery] = useState('');
     const { data, setData, post: postRequest, processing, errors } = useForm({
         _method: 'PATCH',
         title: post.title || '',
@@ -14,6 +15,10 @@ export default function Edit({ post, products }) {
         recommended_products: post.recommended_products || [],
         image: null,
     });
+
+    const filteredProducts = products.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -107,8 +112,19 @@ export default function Edit({ post, products }) {
 
                         <div className="pt-8">
                             <label className="block text-[10px] uppercase tracking-widest font-bold text-deep-espresso/40 mb-6">Рекомендовать товары</label>
+                            
+                            <div className="mb-6">
+                                <input 
+                                    type="text"
+                                    placeholder="Поиск товаров..."
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    className="w-full bg-[#FAF9F6] border border-deep-espresso/10 p-4 text-xs uppercase tracking-widest font-bold focus:ring-1 focus:ring-champagne-gold transition-all"
+                                />
+                            </div>
+
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 h-96 overflow-y-auto p-4 border border-deep-espresso/5 bg-[#FAF9F6]">
-                                {products.map(product => (
+                                {filteredProducts.map(product => (
                                     <button
                                         key={product.id}
                                         type="button"

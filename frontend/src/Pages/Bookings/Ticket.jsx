@@ -2,6 +2,8 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Ticket({ booking, qrCodeUrl }) {
+    const isPassed = new Date(booking.master_class.date_time) < new Date();
+
     return (
         <div className="min-h-screen bg-[#FAF9F6] py-12 px-4 flex flex-col items-center justify-center">
             <Head title={`Билет #${booking.ticket_code} — Beauty Atelier`} />
@@ -9,6 +11,14 @@ export default function Ticket({ booking, qrCodeUrl }) {
             <div className="max-w-md w-full bg-white shadow-2xl relative overflow-hidden">
                 {/* Header Decoration */}
                 <div className="h-2 bg-champagne-gold w-full"></div>
+                
+                {isPassed && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                        <div className="border-4 border-red-800/20 px-6 py-2 -rotate-12 bg-white/40 backdrop-blur-[1px]">
+                            <p className="font-serif italic text-2xl text-red-900/40 uppercase tracking-widest font-black">Событие завершено</p>
+                        </div>
+                    </div>
+                )}
                 
                 <div className="p-10">
                     <div className="flex justify-between items-start mb-10">

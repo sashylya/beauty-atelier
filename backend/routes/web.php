@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
     // Заказы
     Route::get('/checkout', [\App\Http\Controllers\OrderController::class, 'checkout'])->name('checkout.index');
     Route::post('/orders', [\App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [\App\Http\Controllers\OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/success', [\App\Http\Controllers\OrderController::class, 'success'])->name('orders.success');
     Route::post('/orders/{order}/pay', [\App\Http\Controllers\OrderController::class, 'pay'])->name('orders.pay');
     Route::post('/orders/{order}/cancel', [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');

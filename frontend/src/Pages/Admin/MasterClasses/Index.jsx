@@ -2,7 +2,7 @@ import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 
-export default function Index({ masterClasses, bookings }) {
+export default function Index({ masterClasses, bookings, filters, allMasterClasses }) {
     const { delete: destroy } = useForm();
 
     const handleDeleteMC = (id) => {
@@ -21,15 +21,44 @@ export default function Index({ masterClasses, bookings }) {
         }
     };
 
+    const handleMCFilter = (status) => {
+        router.get(route('admin.master-classes.index'), { ...filters, mc_status: status }, { preserveState: true });
+    };
+
+    const handleBookingFilter = (field, value) => {
+        const newFilters = { ...filters, [field]: value };
+        if (!value) delete newFilters[field];
+        router.get(route('admin.master-classes.index'), newFilters, { preserveState: true });
+    };
+
     return (
         <AdminLayout>
             <Head title="Мастер-классы и Записи" />
-            
+
             {/* Section: Master Classes */}
             <div className="flex justify-between items-end mb-12">
                 <div>
                     <h1 className="font-serif text-4xl italic text-[#3D2B1F]">Мастер-классы</h1>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#3D2B1F]/40 mt-4">Управление расписанием и программой</p>
+                    <div className="flex gap-4 mt-6">
+                        <button 
+                            onClick={() => handleMCFilter('')}
+                            className={`text-[9px] uppercase tracking-widest font-bold px-4 py-2 border ${!filters.mc_status ? 'bg-[#3D2B1F] text-white' : 'text-[#3D2B1F] border-[#3D2B1F]/20'}`}
+                        >
+                            Все
+                        </button>
+                        <button 
+                            onClick={() => handleMCFilter('upcoming')}
+                            className={`text-[9px] uppercase tracking-widest font-bold px-4 py-2 border ${filters.mc_status === 'upcoming' ? 'bg-[#3D2B1F] text-white' : 'text-[#3D2B1F] border-[#3D2B1F]/20'}`}
+                        >
+                            Предстоящие
+                        </button>
+                        <button 
+                            onClick={() => handleMCFilter('passed')}
+                            className={`text-[9px] uppercase tracking-widest font-bold px-4 py-2 border ${filters.mc_status === 'passed' ? 'bg-[#3D2B1F] text-white' : 'text-[#3D2B1F] border-[#3D2B1F]/20'}`}
+                        >
+                            Прошедшие
+                        </button>
+                    </div>
                 </div>
                 <Link
                     href={route('admin.master-classes.create')}
@@ -58,6 +87,7 @@ export default function Index({ masterClasses, bookings }) {
                                 </td>
                                 <td className="py-4 px-6 text-[#3D2B1F]/80 text-sm">
                                     {new Date(mc.date_time).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
+                                    {new Date(mc.date_time) < new Date() && <span className="ml-3 text-[8px] uppercase font-bold text-red-800/40">Завершен</span>}
                                 </td>
                                 <td className="py-4 px-6 text-center text-[#3D2B1F]/80 text-sm font-serif italic">
                                     {mc.capacity}
@@ -86,9 +116,34 @@ export default function Index({ masterClasses, bookings }) {
             </div>
 
             {/* Section: Bookings */}
-            <div className="mb-12">
-                <h2 className="font-serif text-3xl italic text-[#3D2B1F]">Последние записи</h2>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#3D2B1F]/40 mt-4">Список всех клиентов, забронировавших места</p>
+            <div className="mb-12 flex justify-between items-end">
+                <div>
+                    <h2 className="font-serif text-3xl italic text-[#3D2B1F]">Записи клиентов</h2>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#3D2B1F]/40 mt-4">Фильтрация и управление бронированиями</p>
+                </div>
+                <div className="flex gap-4">
+                    <select 
+                        value={filters.mc_id || ''}
+                        onChange={(e) => handleBookingFilter('mc_id', e.target.value)}
+                        className="text-[10px] uppercase tracking-widest font-bold border-[#3D2B1F]/10 bg-white focus:ring-0 cursor-pointer p-3"
+                    >
+                        <option value="">Все мастер-классы</option>
+                        {allMasterClasses.map(mc => (
+                            <option key={mc.id} value={mc.id}>{mc.title}</option>
+                        ))}
+                    </select>
+                    <select 
+                        value={filters.booking_status || ''}
+                        onChange={(e) => handleBookingFilter('booking_status', e.target.value)}
+                        className="text-[10px] uppercase tracking-widest font-bold border-[#3D2B1F]/10 bg-white focus:ring-0 cursor-pointer p-3"
+                    >
+                        <option value="">Любой статус</option>
+                        <option value="pending">Ожидает оплаты</option>
+                        <option value="paid">Оплачено</option>
+                        <option value="confirmed">Подтверждено</option>
+                        <option value="cancelled">Отменено</option>
+                    </select>
+                </div>
             </div>
 
             <div className="bg-white shadow-sm border border-[#3D2B1F]/5 overflow-hidden">

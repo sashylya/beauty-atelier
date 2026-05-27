@@ -174,6 +174,17 @@ class OrderController extends Controller
         ]);
     }
 
+    public function show(Order $order)
+    {
+        if ($order->user_id !== auth()->id() && !auth()->user()->is_admin) {
+            abort(403);
+        }
+
+        return Inertia::render('Orders/Show', [
+            'order' => $order->load('items.sku.product')
+        ]);
+    }
+
     public function pay(Order $order)
     {
         if ($order->user_id !== auth()->id()) {

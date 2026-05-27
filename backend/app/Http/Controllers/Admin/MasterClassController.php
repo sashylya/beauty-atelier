@@ -10,11 +10,30 @@ use Illuminate\Support\Facades\Storage;
 
 class MasterClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $mcQuery = MasterClass::latest();
+        if ($request->has('mc_status')) {
+            if ($request->mc_status === 'upcoming') {
+                $mcQuery->where('date_time', '>=', now());
+            } elseif ($request->mc_status === 'passed') {
+                $mcQuery->where('date_time', '<', now());
+            }
+        }
+
+        $bookingQuery = \App\Models\Booking::with(['user', 'masterClass'])->latest();
+        if ($request->has('booking_status')) {
+            $bookingQuery->where('status', $request->booking_status);
+        }
+        if ($request->has('mc_id')) {
+            $bookingQuery->where('master_class_id', $request->mc_id);
+        }
+
         return Inertia::render('Admin/MasterClasses/Index', [
-            'masterClasses' => MasterClass::latest()->get(),
-            'bookings' => \App\Models\Booking::with(['user', 'masterClass'])->latest()->get()
+            'masterClasses' => $mcQuery->get(),
+            'bookings' => $bookingQuery->get(),
+            'filters' => $request->only(['mc_status', 'booking_status', 'mc_id']),
+            'allMasterClasses' => MasterClass::orderBy('date_time', 'desc')->get(['id', 'title'])
         ]);
     }
 

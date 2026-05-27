@@ -3,6 +3,20 @@ import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Index({ masterClasses }) {
+    const sortedMasterClasses = [...masterClasses].sort((a, b) => {
+        const dateA = new Date(a.date_time);
+        const dateB = new Date(b.date_time);
+        const now = new Date();
+        const isPassedA = dateA < now;
+        const isPassedB = dateB < now;
+
+        if (isPassedA !== isPassedB) {
+            return isPassedA ? 1 : -1;
+        }
+        
+        return isPassedA ? dateB - dateA : dateA - dateB;
+    });
+
     return (
         <BeautyLayout>
             <Head title="Мастер-классы — Beauty Atelier" />
@@ -18,12 +32,20 @@ export default function Index({ masterClasses }) {
                 </header>
 
                 <div className="space-y-40">
-                    {masterClasses.map((mc, index) => {
+                    {sortedMasterClasses.map((mc, index) => {
                         const date = new Date(mc.date_time);
+                        const isPassed = date < new Date();
                         return (
-                            <div key={mc.id} className={`flex flex-col lg:flex-row items-center gap-20 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+                            <div key={mc.id} className={`flex flex-col lg:flex-row items-center gap-20 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''} ${isPassed ? 'opacity-60' : ''}`}>
                                 {/* Image / Visual Side */}
                                 <div className="w-full lg:w-3/5 aspect-[16/10] bg-white relative overflow-hidden group shadow-sm">
+                                    {isPassed && (
+                                        <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                                            <div className="border-2 border-deep-espresso/20 px-6 py-3 -rotate-12 bg-white/40">
+                                                <p className="font-serif italic text-2xl text-deep-espresso opacity-40 uppercase tracking-widest">Завершено</p>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="absolute inset-0 bg-[#F8F8F8] flex items-center justify-center">
                                          {mc.image_url && (
                                              <img 
@@ -39,9 +61,13 @@ export default function Index({ masterClasses }) {
                                 <div className="w-full lg:w-2/5 space-y-10">
                                     <div>
                                         <p className="uppercase tracking-[0.3em] text-[10px] font-bold text-champagne-gold mb-4">
-                                            {date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} • {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                                            {isPassed ? 'Прошедшее событие' : (
+                                                <>
+                                                    {date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} • {date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                                                </>
+                                            )}
                                         </p>
-                                        <h2 className="font-serif italic text-5xl text-deep-espresso leading-tight">{mc.title}</h2>
+                                        <h2 className={`font-serif italic text-5xl text-deep-espresso leading-tight ${isPassed ? 'opacity-40' : ''}`}>{mc.title}</h2>
                                     </div>
 
                                     <p className="text-deep-espresso/70 leading-relaxed font-light text-base lg:text-lg">
@@ -54,12 +80,14 @@ export default function Index({ masterClasses }) {
                                                 <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Цена</p>
                                                 <p className="text-2xl font-light tracking-tight">{mc.price.toLocaleString()} ₽</p>
                                             </div>
-                                            <div>
-                                                <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Наличие мест</p>
-                                                <p className="text-[11px] uppercase tracking-widest font-bold text-champagne-gold">
-                                                    {mc.available_seats > 0 ? `${mc.available_seats} Мест` : 'Нет мест'}
-                                                </p>
-                                            </div>
+                                            {!isPassed && (
+                                                <div>
+                                                    <p className="uppercase tracking-[0.3em] text-[8px] font-bold opacity-30 mb-2">Наличие мест</p>
+                                                    <p className="text-[11px] uppercase tracking-widest font-bold text-champagne-gold">
+                                                        {mc.available_seats > 0 ? `${mc.available_seats} Мест` : 'Нет мест'}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="pb-4">
@@ -69,9 +97,13 @@ export default function Index({ masterClasses }) {
 
                                         <Link 
                                             href={route('master-classes.show', mc.id)}
-                                            className="inline-block w-full text-center bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-champagne-gold transition-all duration-500 shadow-xl hover:shadow-none"
+                                            className={`inline-block w-full text-center uppercase tracking-[0.4em] text-[11px] font-bold py-6 transition-all duration-500 shadow-xl hover:shadow-none ${
+                                                isPassed 
+                                                    ? 'bg-gray-100 text-gray-400 border border-gray-200 shadow-none' 
+                                                    : 'bg-deep-espresso text-creamy-silk hover:bg-champagne-gold'
+                                            }`}
                                         >
-                                            Узнать больше и забронировать
+                                            {isPassed ? 'Посмотреть детали' : 'Узнать больше и забронировать'}
                                         </Link>
                                     </div>
                                 </div>

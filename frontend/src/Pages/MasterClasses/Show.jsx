@@ -28,6 +28,7 @@ export default function Show({ masterClass, auth }) {
     };
 
     const date = new Date(masterClass.date_time);
+    const isPassed = date < new Date();
 
     return (
         <BeautyLayout>
@@ -43,7 +44,14 @@ export default function Show({ masterClass, auth }) {
                         </Link>
 
                         {/* Master Class Image */}
-                        <div className="aspect-[16/9] w-full bg-[#FAF9F6] mb-12 overflow-hidden border border-deep-espresso/5 shadow-sm">
+                        <div className="aspect-[16/9] w-full bg-[#FAF9F6] mb-12 overflow-hidden border border-deep-espresso/5 shadow-sm relative">
+                            {isPassed && (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+                                    <div className="border-4 border-deep-espresso/20 px-8 py-4 -rotate-12">
+                                        <p className="font-serif italic text-4xl text-deep-espresso opacity-40 uppercase tracking-widest">Мероприятие завершено</p>
+                                    </div>
+                                </div>
+                            )}
                             {masterClass.image_url ? (
                                 <img 
                                     src={`/storage/${masterClass.image_url}`} 
@@ -58,8 +66,10 @@ export default function Show({ masterClass, auth }) {
                         </div>
                         
                         <div className="mb-16">
-                            <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">новое событие</p>
-                            <h1 className="font-serif italic text-6xl lg:text-7xl text-deep-espresso mb-10 leading-tight">
+                            <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">
+                                {isPassed ? 'прошедшее событие' : 'новое событие'}
+                            </p>
+                            <h1 className={`font-serif italic text-6xl lg:text-7xl text-deep-espresso mb-10 leading-tight ${isPassed ? 'opacity-40' : ''}`}>
                                 {masterClass.title}
                             </h1>
                             <div className="flex flex-wrap gap-x-12 gap-y-6 py-10 border-y border-deep-espresso/10">
@@ -127,7 +137,11 @@ export default function Show({ masterClass, auth }) {
                                     <span className="text-3xl font-light">{parseFloat(masterClass.price).toLocaleString()} ₽</span>
                                 </div>
 
-                                {auth.user ? (
+                                {isPassed ? (
+                                    <div className="w-full bg-gray-100 text-gray-400 uppercase tracking-[0.4em] text-[11px] font-bold py-6 text-center">
+                                        Мастер-класс завершен
+                                    </div>
+                                ) : auth.user ? (
                                     <button 
                                         type="submit"
                                         disabled={processing || masterClass.available_seats <= 0}
