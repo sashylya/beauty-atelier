@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,6 +32,7 @@ class RegisteredUserController extends Controller
                 'lowercase', 
                 'email', 
                 'max:255', 
+                Rule::unique(User::class, 'email'),
                 'regex:/^[a-z0-9._%+-]+@gmail\.com$/i'
             ],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
@@ -39,6 +41,7 @@ class RegisteredUserController extends Controller
             'name.regex' => 'Имя может содержать только буквы, пробелы и дефисы.',
             'email.required' => 'Поле Email обязательно для заполнения.',
             'email.email' => 'Введите корректный адрес электронной почты.',
+            'email.unique' => 'Пользователь с таким email уже существует.',
             'email.regex' => 'Регистрация возможна только с почтой @gmail.com.',
             'password.required' => 'Поле Пароль не может быть пустым.',
             'password.confirmed' => 'Пароли не совпадают.',
