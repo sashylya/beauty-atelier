@@ -53,14 +53,11 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('additional_images')) {
-            $additionalPaths = $product->additional_images ?? [];
+            $additionalPaths = [];
             foreach ($request->file('additional_images') as $file) {
                 $additionalPaths[] = $file->store('products', 'public');
             }
             $validated['additional_images'] = $additionalPaths;
-        } else {
-            // Предотвращаем затирание существующих фото пустым массивом из валидации
-            unset($validated['additional_images']);
         }
 
         unset($validated['image']);
@@ -69,7 +66,7 @@ class ProductController extends Controller
             $validated['price'] = round($validated['price']);
         }
 
-        $product->update($validated);
+        Product::create($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
     }

@@ -121,7 +121,7 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
 
                     <div 
                         ref={sliderRef}
-                        className={`flex gap-10 overflow-x-auto hide-scrollbar snap-x snap-mandatory scroll-smooth pb-10 ${hitProducts && hitProducts.length <= 3 ? 'justify-center' : ''}`}
+                        className={`flex gap-6 md:gap-10 overflow-x-auto hide-scrollbar snap-x snap-mandatory scroll-smooth pb-10 ${hitProducts && hitProducts.length <= 4 ? 'lg:justify-between' : ''}`}
                     >
                         {hitProducts && hitProducts.map((product) => {
                             const categoryLabels = {
@@ -131,7 +131,7 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                                 'tools': 'Инструменты'
                             };
                             return (
-                                <div key={product.id} className="w-[220px] md:w-[260px] lg:w-[280px] flex-shrink-0 snap-start group">
+                                <div key={product.id} className="w-full sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-120px)/4)] flex-shrink-0 snap-start group">
                                      <Link href={route('catalog.show', product.slug)} className="block">
                                         <div className="aspect-[4/5] bg-[#F2F2F2] flex items-center justify-center mb-8 overflow-hidden relative border border-[#3D2B1F]/5 shadow-sm">
                                             {product.image_path ? (
@@ -144,9 +144,13 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
                                                 <div className="font-serif italic text-4xl opacity-5 uppercase tracking-widest">{categoryLabels[product.category] || product.category}</div>
                                             )}
                                         </div>
-                                        <div className="text-center px-4">
+                                        <div className="text-center px-4 flex flex-col items-center">
                                             <p className="text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] mb-3 font-bold">{categoryLabels[product.category] || product.category}</p>
-                                            <h4 className="font-serif italic text-2xl text-[#3D2B1F] mb-4 transition-colors group-hover:text-[#8B5A2B]">{product.name}</h4>
+                                            <div className="h-16 flex items-center justify-center mb-4 w-full">
+                                                <h4 className="font-serif italic text-xl sm:text-2xl text-[#3D2B1F] transition-colors group-hover:text-[#8B5A2B] line-clamp-2 leading-tight">
+                                                    {product.name}
+                                                </h4>
+                                            </div>
                                             <p className="text-[9px] uppercase tracking-widest font-bold text-[#3D2B1F]/30 group-hover:text-[#3D2B1F] transition-colors border-b border-transparent group-hover:border-[#3D2B1F]/10 inline-block pb-1">Посмотреть</p>
                                         </div>
                                      </Link>

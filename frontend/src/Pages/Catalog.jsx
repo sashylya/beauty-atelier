@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BeautyLayout from '@/Layouts/BeautyLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import Pagination from '@/Components/Pagination';
 
 export default function Catalog({ products, filters }) {
     const { auth, favoriteProductIds = [] } = usePage().props;
@@ -14,13 +15,14 @@ export default function Catalog({ products, filters }) {
     };
     
     // Проверка, активен ли хоть один фильтр (кроме категории и дефолтной сортировки)
-    const hasActiveFilters = filters.min_price || filters.max_price || filters.coverage || filters.finish || (filters.sort && filters.sort !== 'newest');
+    const hasActiveFilters = filters.min_price || filters.max_price || filters.coverage || filters.finish || filters.in_stock || (filters.sort && filters.sort !== 'newest');
 
     const [localFilters, setLocalFilters] = useState({
         min_price: filters.min_price || '',
         max_price: filters.max_price || '',
         coverage: filters.coverage || '',
         finish: filters.finish || '',
+        in_stock: filters.in_stock || false,
         sort: filters.sort || 'newest',
     });
 
@@ -30,6 +32,7 @@ export default function Catalog({ products, filters }) {
             max_price: filters.max_price || '',
             coverage: filters.coverage || '',
             finish: filters.finish || '',
+            in_stock: filters.in_stock || false,
             sort: filters.sort || 'newest',
         });
     }, [filters]);
@@ -58,6 +61,7 @@ export default function Catalog({ products, filters }) {
             max_price: '',
             coverage: '',
             finish: '',
+            in_stock: false,
             sort: 'newest'
         };
         setLocalFilters(emptyFilters);
@@ -112,10 +116,10 @@ export default function Catalog({ products, filters }) {
             
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
                 <header className="mb-12 lg:mb-20">
-                    <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 mb-10 lg:mb-12">
-                        <div className="w-full min-w-0">
+                    <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-8 mb-10 lg:mb-12">
+                        <div className="w-full lg:w-1/2 min-w-0">
                             <p className="uppercase tracking-[0.3em] text-[10px] font-semibold text-champagne-gold mb-4">Наши основы</p>
-                            <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso break-words">
+                            <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso break-words leading-tight">
                                 {filters.search ? 'Поиск' : 'Коллекция'}
                             </h1>
                             {filters.search && (
@@ -127,17 +131,18 @@ export default function Catalog({ products, filters }) {
                                 </p>
                             )}
                         </div>
-                        <div className="flex flex-wrap md:justify-end gap-x-7 sm:gap-x-10 gap-y-4 uppercase tracking-[0.2em] text-[10px] font-semibold text-deep-espresso/40">
-                            <Link href={route('catalog.index')} className={!filters.category ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Все</Link>
-                            <Link href={route('catalog.index', { category: 'face' })} className={filters.category === 'face' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Лицо</Link>
-                            <Link href={route('catalog.index', { category: 'eyes' })} className={filters.category === 'eyes' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Глаза</Link>
-                            <Link href={route('catalog.index', { category: 'lips' })} className={filters.category === 'lips' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Губы</Link>
+                        <div className="flex flex-nowrap items-center overflow-x-auto hide-scrollbar justify-start lg:justify-end gap-x-8 lg:gap-x-12 uppercase tracking-[0.2em] text-[10px] font-semibold text-deep-espresso/40 pb-4 lg:pb-0 min-w-0 w-full lg:w-auto">
+                            <Link href={route('catalog.index')} className={`whitespace-nowrap transition-all flex-shrink-0 ${!filters.category ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso'}`}>Все</Link>
+                            <Link href={route('catalog.index', { category: 'face' })} className={`whitespace-nowrap transition-all flex-shrink-0 ${filters.category === 'face' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso'}`}>Лицо</Link>
+                            <Link href={route('catalog.index', { category: 'eyes' })} className={`whitespace-nowrap transition-all flex-shrink-0 ${filters.category === 'eyes' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso'}`}>Глаза</Link>
+                            <Link href={route('catalog.index', { category: 'lips' })} className={`whitespace-nowrap transition-all flex-shrink-0 ${filters.category === 'lips' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso'}`}>Губы</Link>
+                            <Link href={route('catalog.index', { category: 'tools' })} className={`whitespace-nowrap transition-all flex-shrink-0 ${filters.category === 'tools' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso'}`}>Инструменты</Link>
                         </div>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 py-4 border-y border-deep-espresso/10">
                          <div className="uppercase tracking-[0.2em] text-[9px] font-semibold opacity-60">
-                            {products.length} Товаров
+                            {products.total} Товаров
                          </div>
                          <div className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-12 gap-4 sm:gap-0 sm:items-center uppercase tracking-[0.2em] text-[9px] font-semibold">
                             <div className="flex items-center gap-4">
@@ -231,19 +236,32 @@ export default function Catalog({ products, filters }) {
                                     </select>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                                    <button 
-                                        onClick={() => applyFilters(localFilters)}
-                                        className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-widest text-[10px] font-bold py-3 hover:bg-black transition duration-500"
-                                    >
-                                        Применить
-                                    </button>
-                                    <button 
-                                        onClick={handleReset}
-                                        className="px-6 py-3 text-[9px] uppercase tracking-[0.2em] font-bold text-deep-espresso/40 hover:text-deep-espresso transition duration-500"
-                                    >
-                                        Очистить
-                                    </button>
+                                <div className="flex flex-col gap-6">
+                                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => handleFilterChange('in_stock', !localFilters.in_stock)}>
+                                        <div className={`w-4 h-4 border border-deep-espresso/20 flex items-center justify-center transition-all ${localFilters.in_stock ? 'bg-deep-espresso border-deep-espresso' : 'bg-transparent'}`}>
+                                            {localFilters.in_stock && (
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="white" className="w-2.5 h-2.5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-deep-espresso/60 group-hover:text-deep-espresso transition-colors">Только в наличии</span>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+                                        <button 
+                                            onClick={() => applyFilters(localFilters)}
+                                            className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-widest text-[10px] font-bold py-3 hover:bg-black transition duration-500"
+                                        >
+                                            Применить
+                                        </button>
+                                        <button 
+                                            onClick={handleReset}
+                                            className="px-6 py-3 text-[9px] uppercase tracking-[0.2em] font-bold text-deep-espresso/40 hover:text-deep-espresso transition duration-500"
+                                        >
+                                            Очистить
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -251,7 +269,7 @@ export default function Catalog({ products, filters }) {
                 </header>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 lg:gap-x-12 gap-y-12">
-                    {products.map((product) => (
+                    {products.data.map((product) => (
                         <div key={product.id} className="group">
                             <Link href={route('catalog.show', product.slug)} className="block">
                                 <div className="aspect-[4/5] overflow-hidden bg-[#F0F0F0] mb-6 relative border border-deep-espresso/5 shadow-sm">
@@ -324,8 +342,10 @@ export default function Catalog({ products, filters }) {
                         </div>
                     ))}
                 </div>
+
+                <Pagination links={products.links} />
                 
-                {products.length === 0 && (
+                {products.data.length === 0 && (
                     <div className="py-40 text-center">
                         <p className="font-serif italic text-2xl text-deep-espresso/40 tracking-widest">Ничего не найдено</p>
                         <button 

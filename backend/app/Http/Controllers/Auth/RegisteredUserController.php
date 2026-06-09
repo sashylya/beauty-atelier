@@ -32,8 +32,7 @@ class RegisteredUserController extends Controller
                 'lowercase', 
                 'email', 
                 'max:255', 
-                Rule::unique(User::class, 'email'),
-                'regex:/^[a-z0-9._%+-]+@gmail\.com$/i'
+                Rule::unique(User::class, 'email')
             ],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
         ], [
@@ -42,7 +41,6 @@ class RegisteredUserController extends Controller
             'email.required' => 'Поле Email обязательно для заполнения.',
             'email.email' => 'Введите корректный адрес электронной почты.',
             'email.unique' => 'Пользователь с таким email уже существует.',
-            'email.regex' => 'Регистрация возможна только с почтой @gmail.com.',
             'password.required' => 'Поле Пароль не может быть пустым.',
             'password.confirmed' => 'Пароли не совпадают.',
             'password.min' => 'Пароль должен содержать минимум 8 символов.',

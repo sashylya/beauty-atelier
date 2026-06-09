@@ -10,10 +10,21 @@ class MasterClassController extends Controller
 {
     public function index()
     {
-        $masterClasses = MasterClass::orderBy('date_time')->get()->each->append('available_seats');
+        $now = now();
+        
+        $activeMasterClasses = MasterClass::where('date_time', '>=', $now)
+            ->orderBy('date_time', 'asc')
+            ->paginate(6, ['*'], 'active_page');
+        $activeMasterClasses->getCollection()->each->append('available_seats');
+
+        $pastMasterClasses = MasterClass::where('date_time', '<', $now)
+            ->orderBy('date_time', 'desc')
+            ->paginate(6, ['*'], 'past_page');
+        $pastMasterClasses->getCollection()->each->append('available_seats');
 
         return Inertia::render('MasterClasses/Index', [
-            'masterClasses' => $masterClasses,
+            'activeMasterClasses' => $activeMasterClasses,
+            'pastMasterClasses' => $pastMasterClasses,
         ]);
     }
 

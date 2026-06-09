@@ -89,6 +89,13 @@ class ProductController extends Controller
             }
         }
 
+        // Фильтр по наличию
+        if ($request->boolean('in_stock')) {
+            $query->whereHas('skus', function ($q) {
+                $q->where('stock', '>', 0);
+            });
+        }
+
         // Сортировка: Сначала в наличии, потом нет
         $query->orderByRaw('CASE WHEN (SELECT SUM(stock) FROM skus WHERE skus.product_id = products.id) > 0 THEN 0 ELSE 1 END');
 
@@ -108,17 +115,18 @@ class ProductController extends Controller
                 break;
         }
 
-        $products = $query->get();
+        $products = $query->paginate(12)->withQueryString();
 
         // Динамически определяем "Хиты" на основе продаж
         $topSellerIds = Product::topSellers(10)->pluck('id')->toArray();
-        $products->each(function ($product) use ($topSellerIds) {
+        $products->through(function ($product) use ($topSellerIds) {
             $product->is_hit = in_array($product->id, $topSellerIds);
+            return $product;
         });
 
         return Inertia::render('Catalog', [
             'products' => $products,
-            'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish']),
+            'filters' => $request->all(['category', 'search', 'sort', 'min_price', 'max_price', 'coverage', 'finish', 'in_stock']),
         ]);
     }
 
