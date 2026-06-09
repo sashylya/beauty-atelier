@@ -109,12 +109,12 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
         <BeautyLayout>
             <Head title={`${product.name} — Beauty Atelier`} />
             
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
                     
                     {/* Left: Sticky Image Gallery */}
                     <div className="lg:col-span-6 space-y-8">
-                        <div className="aspect-[4/5] bg-white flex items-center justify-center relative overflow-hidden group max-w-[500px] mx-auto">
+                        <div className="aspect-[4/5] bg-white flex items-center justify-center relative overflow-hidden group max-w-[420px] sm:max-w-[500px] mx-auto">
                              <div 
                                 className="absolute inset-0 transition-all duration-1000 ease-in-out"
                                 style={{ backgroundColor: `${selectedSku.color_hex}08` }}
@@ -208,8 +208,8 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                 <span>/</span>
                                 <span className="text-champagne-gold uppercase">{categoryLabels[product.category] || product.category}</span>
                             </nav>
-                            <h1 className="font-serif italic text-4xl lg:text-5xl text-deep-espresso mb-6 leading-tight">{product.name}</h1>
-                            <div className="flex items-center space-x-4 mb-8">
+                            <h1 className="font-serif italic text-3xl sm:text-4xl lg:text-5xl text-deep-espresso mb-6 leading-tight break-words">{product.name}</h1>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8">
                                 <span className="text-2xl font-light tracking-tight text-deep-espresso">{parseFloat(selectedSku.price || product.price || 0).toLocaleString()} ₽</span>
                                 {averageRating > 0 && (
                                     <div className="flex items-center gap-1.5">
@@ -245,7 +245,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                         )}
 
                         {/* Attributes */}
-                        <div className="grid grid-cols-2 gap-8 mb-10 border-y border-deep-espresso/10 py-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-10 border-y border-deep-espresso/10 py-8">
                             <div className="space-y-1">
                                 <p className="uppercase tracking-[0.3em] text-[7px] font-black text-deep-espresso/30">Покрытие</p>
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold">{selectedSku.coverage}</p>
@@ -269,7 +269,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                             <button 
                                 onClick={addToCart}
                                 disabled={processing || product.skus.length === 0 || (selectedSku.id && selectedSku.stock <= 0)}
-                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[10px] font-bold py-5 hover:bg-black transition-all duration-500 shadow-xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-[0.22em] sm:tracking-[0.4em] text-[10px] font-bold py-5 hover:bg-black transition-all duration-500 shadow-xl hover:shadow-none translate-y-0 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {product.skus.length === 0 
                                     ? 'Нет в наличии' 
@@ -306,7 +306,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                         if (other) setComparisonSku(other);
                                     }
                                 }}
-                                className={`w-full border border-deep-espresso uppercase tracking-[0.4em] text-[10px] font-bold py-5 transition-all duration-500 mb-8 ${
+                                className={`w-full border border-deep-espresso uppercase tracking-[0.22em] sm:tracking-[0.4em] text-[10px] font-bold py-5 transition-all duration-500 mb-8 ${
                                     isComparing ? 'bg-champagne-gold text-white border-champagne-gold' : 'text-deep-espresso hover:bg-deep-espresso hover:text-creamy-silk'
                                 }`}
                             >
@@ -329,14 +329,14 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                 </div>
 
                 {/* Reviews Section */}
-                <div className="mt-20 pt-16 border-t border-deep-espresso/10">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <div className="mt-16 lg:mt-20 pt-12 lg:pt-16 border-t border-deep-espresso/10">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
                         <div className="lg:col-span-4">
-                            <h2 className="font-serif italic text-4xl text-deep-espresso mb-8">Отзывы</h2>
+                            <h2 className="font-serif italic text-3xl sm:text-4xl text-deep-espresso mb-6 sm:mb-8">Отзывы</h2>
                             <p className="text-deep-espresso/60 text-sm leading-relaxed mb-12">Мы ценим ваше мнение о нашей продукции. Поделитесь своим опытом использования, чтобы помочь другим сделать правильный выбор.</p>
                             
                             {auth.user ? (
-                                <form onSubmit={submitReview} className="space-y-6 bg-creamy-silk/30 p-8 rounded-sm border border-deep-espresso/5">
+                                <form onSubmit={submitReview} className="space-y-6 bg-creamy-silk/30 p-5 sm:p-8 rounded-sm border border-deep-espresso/5">
                                     {flash?.success && (
                                         <div className="bg-green-50 text-green-700 p-4 text-xs uppercase tracking-widest font-bold mb-6">
                                             {flash.success}
@@ -400,7 +400,7 @@ export default function Show({ product, reviews = [], averageRating = 0 }) {
                                     <button
                                         type="submit"
                                         disabled={processingReview}
-                                        className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.3em] text-[10px] font-bold py-4 hover:bg-black transition-all disabled:opacity-50"
+                                        className="w-full bg-deep-espresso text-creamy-silk uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] font-bold py-4 hover:bg-black transition-all disabled:opacity-50"
                                     >
                                         {processingReview ? 'Отправка...' : 'Опубликовать'}
                                     </button>

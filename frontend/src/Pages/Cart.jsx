@@ -22,18 +22,18 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
         <BeautyLayout>
             <Head title="Ваш выбор — Beauty Atelier" />
             
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-                <header className="mb-20 text-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-32">
+                <header className="mb-12 lg:mb-20 text-center">
                     <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">Корзина Ателье</p>
-                    <h1 className="font-serif italic text-6xl text-deep-espresso">Ваш выбор</h1>
+                    <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso">Ваш выбор</h1>
                 </header>
 
                 {items.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
                         <div className="lg:col-span-8 space-y-12">
                             {items.map((item) => (
-                                <div key={item.sku.id} className="flex gap-8 pb-12 border-b border-deep-espresso/5">
-                                    <Link href={route('catalog.show', item.sku.product.slug)} className="block w-32 h-40 flex-shrink-0">
+                                <div key={item.sku.id} className="flex flex-col sm:flex-row gap-6 sm:gap-8 pb-10 lg:pb-12 border-b border-deep-espresso/5">
+                                    <Link href={route('catalog.show', item.sku.product.slug)} className="block w-full sm:w-32 h-64 sm:h-40 flex-shrink-0">
                                         <div className="w-full h-full bg-white flex items-center justify-center overflow-hidden border border-deep-espresso/5 transition-transform hover:scale-105 duration-500">
                                             {item.sku.image_url ? (
                                                 <img src={`/storage/${item.sku.image_url}`} alt="" className="w-full h-full object-cover" />
@@ -43,7 +43,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                                         </div>
                                     </Link>
                                     <div className="flex-1 flex flex-col justify-between">
-                                        <div className="flex justify-between items-start">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                                             <div>
                                                 <Link href={route('catalog.show', item.sku.product.slug)} className="block group">
                                                     <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-2 group-hover:text-champagne-gold transition-colors">{item.sku.product.name}</h3>
@@ -55,7 +55,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                                             </div>
                                             <span className="font-light">{(item.sku.price * item.quantity).toLocaleString()} ₽</span>
                                         </div>
-                                        <div className="flex justify-between items-end">
+                                        <div className="flex justify-between items-end gap-4 mt-6 sm:mt-0">
                                             <div className="flex items-center border border-deep-espresso/10 p-1 bg-white">
                                                 <button onClick={() => updateQuantity(item.sku.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center hover:bg-creamy-silk" disabled={item.quantity <= 1}>—</button>
                                                 <span className="w-10 text-center text-xs font-bold">{item.quantity}</span>
@@ -68,7 +68,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                             ))}
 
                             {!isDeliveryFree && (
-                                <div className="p-6 bg-[#FDF5E6] border border-[#D4AF37]/20 flex items-center justify-between">
+                                <div className="p-5 sm:p-6 bg-[#FDF5E6] border border-[#D4AF37]/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <p className="text-[10px] uppercase tracking-[0.2em] text-[#8B5A2B]">
                                         Добавьте еще на <span className="font-bold">{remainingForFree.toLocaleString()} ₽</span> для бесплатной доставки
                                     </p>
@@ -77,7 +77,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                             )}
                         </div>
 
-                        <div className="lg:col-span-4 bg-white p-12 shadow-sm border border-deep-espresso/5 self-start">
+                        <div className="lg:col-span-4 bg-white p-6 sm:p-8 lg:p-12 shadow-sm border border-deep-espresso/5 self-start lg:sticky lg:top-28">
                             <h3 className="font-serif italic text-2xl mb-8">Сумма заказа</h3>
                             <div className="space-y-6 mb-12">
                                 <div className="flex justify-between text-sm">
@@ -101,7 +101,7 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                             </div>
                             <Link 
                                 href={items.some(item => item.sku.stock <= 0) ? '#' : route('checkout.index')}
-                                className={`block w-full py-6 uppercase tracking-[0.4em] text-[11px] font-bold transition-all duration-500 shadow-xl text-center ${
+                                className={`block w-full py-5 sm:py-6 uppercase tracking-[0.24em] sm:tracking-[0.4em] text-[10px] sm:text-[11px] font-bold transition-all duration-500 shadow-xl text-center ${
                                     items.some(item => item.sku.stock <= 0) 
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
                                     : 'bg-deep-espresso text-creamy-silk hover:bg-black'
@@ -113,9 +113,9 @@ export default function Cart({ items, subtotal, total, deliveryFee, isDeliveryFr
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-40">
+                    <div className="text-center py-24 sm:py-40">
                         <p className="font-serif italic text-2xl text-deep-espresso/40 tracking-widest mb-12">Ваша корзина пока пуста.</p>
-                        <Link href={route('catalog.index')} className="bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[10px] font-bold px-12 py-6 hover:bg-champagne-gold transition-all duration-500 shadow-2xl">Вернуться к коллекции</Link>
+                        <Link href={route('catalog.index')} className="inline-block bg-deep-espresso text-creamy-silk uppercase tracking-[0.24em] sm:tracking-[0.4em] text-[10px] font-bold px-8 sm:px-12 py-5 sm:py-6 hover:bg-champagne-gold transition-all duration-500 shadow-2xl">Вернуться к коллекции</Link>
                     </div>
                 )}
             </div>

@@ -30,13 +30,13 @@ export default function Dashboard({ auth, orders, bookings }) {
         <BeautyLayout>
             <Head title="Личный Кабинет — Beauty Atelier" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-20 border-b border-deep-espresso/10 pb-8">
-                    <div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+                <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12 lg:mb-20 border-b border-deep-espresso/10 pb-8">
+                    <div className="w-full min-w-0">
                         <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">Добро пожаловать</p>
-                        <h1 className="font-serif italic text-6xl text-deep-espresso">{auth.user.name}</h1>
+                        <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso break-words">{auth.user.name}</h1>
                     </div>
-                    <div className="flex gap-6 mt-6 md:mt-0">
+                    <div className="flex flex-wrap gap-6 md:justify-end">
                         <Link 
                             href={route('profile.edit')}
                             className="uppercase tracking-[0.2em] text-[10px] font-bold border-b border-deep-espresso hover:text-champagne-gold hover:border-champagne-gold transition pb-1"
@@ -55,10 +55,10 @@ export default function Dashboard({ auth, orders, bookings }) {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="flex gap-12 mb-16 border-b border-deep-espresso/5">
+                <div className="flex gap-8 sm:gap-12 mb-10 lg:mb-16 border-b border-deep-espresso/5 overflow-x-auto hide-scrollbar">
                     <button 
                         onClick={() => setActiveTab('bookings')}
-                        className={`pb-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all relative ${
+                        className={`pb-4 text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.2em] font-bold transition-all relative flex-shrink-0 ${
                             activeTab === 'bookings' ? 'text-deep-espresso' : 'text-deep-espresso/40 hover:text-deep-espresso'
                         }`}
                     >
@@ -68,7 +68,7 @@ export default function Dashboard({ auth, orders, bookings }) {
                     </button>
                     <button 
                         onClick={() => setActiveTab('orders')}
-                        className={`pb-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all relative ${
+                        className={`pb-4 text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.2em] font-bold transition-all relative flex-shrink-0 ${
                             activeTab === 'orders' ? 'text-deep-espresso' : 'text-deep-espresso/40 hover:text-deep-espresso'
                         }`}
                     >
@@ -85,7 +85,7 @@ export default function Dashboard({ auth, orders, bookings }) {
                             {bookings.length > 0 ? (
                                 <div className="flex flex-col gap-6">
                                     {sortedBookings.map((booking) => (
-                                        <div key={booking.id} className="bg-white p-8 shadow-sm border border-deep-espresso/5 relative overflow-hidden group">
+                                        <div key={booking.id} className="bg-white p-5 sm:p-8 shadow-sm border border-deep-espresso/5 relative overflow-hidden group">
                                             <div className="absolute top-0 right-0 w-16 h-16 bg-creamy-silk -rotate-45 translate-x-8 -translate-y-8"></div>
 
                                             <div className="flex justify-between items-start mb-6 relative z-10">
@@ -99,7 +99,7 @@ export default function Dashboard({ auth, orders, bookings }) {
                                                 </div>
                                             </div>
 
-                                            <div className="flex justify-between items-end border-t border-deep-espresso/5 pt-6">
+                                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 border-t border-deep-espresso/5 pt-6">
                                                 <div>
                                                     <p className="text-[10px] uppercase tracking-widest opacity-60 mb-1">Локация</p>
                                                     <p className="font-serif italic text-sm">{booking.master_class.location}</p>
@@ -167,8 +167,8 @@ export default function Dashboard({ auth, orders, bookings }) {
                             {orders.length > 0 ? (
                                 <div className="flex flex-col gap-6">
                                     {orders.map((order) => (
-                                        <div key={order.id} className="bg-white p-8 shadow-sm border border-deep-espresso/5 flex flex-col">
-                                            <div className="flex justify-between items-center mb-6 border-b border-deep-espresso/5 pb-4">
+                                        <div key={order.id} className="bg-white p-5 sm:p-8 shadow-sm border border-deep-espresso/5 flex flex-col">
+                                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 border-b border-deep-espresso/5 pb-4">
                                                 <div>
                                                     <span className="uppercase tracking-[0.2em] text-[10px] font-bold mr-4">Заказ #{order.id}</span>
                                                     <span className="text-xs text-deep-espresso/40">{new Date(order.created_at).toLocaleDateString('ru-RU')}</span>
@@ -188,7 +188,7 @@ export default function Dashboard({ auth, orders, bookings }) {
 
                                             <div className="space-y-4 mb-6 flex-grow">
                                                 {order.items.slice(0, 2).map((item) => (
-                                                    <div key={item.id} className="flex justify-between items-center">
+                                                    <div key={item.id} className="flex justify-between items-center gap-4">
                                                         <Link href={route('catalog.show', item.sku.product.slug)} className="flex items-center gap-4 group">
                                                             <div className="w-10 h-10 bg-[#F0F0F0] overflow-hidden flex-shrink-0">
                                                                 {item.sku.product.image_path ? (
@@ -216,8 +216,8 @@ export default function Dashboard({ auth, orders, bookings }) {
                                                 )}
                                             </div>
 
-                                            <div className="flex justify-between items-center pt-4 border-t border-deep-espresso/5 mt-auto">
-                                                <div className="flex gap-6 items-center">
+                                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-5 pt-4 border-t border-deep-espresso/5 mt-auto">
+                                                <div className="flex flex-wrap gap-6 items-center">
                                                     <Link 
                                                         href={route('orders.show', order.id)}
                                                         className="text-[9px] uppercase tracking-[0.2em] font-bold border-b border-deep-espresso/20 hover:border-deep-espresso transition"

@@ -19,15 +19,15 @@ export default function Index({ items, total, subtotal, deliveryFee, isDeliveryF
         <BeautyLayout>
             <Head title="Оформление заказа — Beauty Atelier" />
             
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-                <header className="mb-20 text-center">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-32">
+                <header className="mb-12 lg:mb-20 text-center">
                     <p className="uppercase tracking-[0.4em] text-[10px] font-bold text-champagne-gold mb-6">Завершение образа</p>
-                    <h1 className="font-serif italic text-6xl text-deep-espresso">Оформление</h1>
+                    <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso">Оформление</h1>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
                     <div className="lg:col-span-7">
-                        <form onSubmit={submit} className="space-y-12">
+                        <form onSubmit={submit} className="space-y-10 lg:space-y-12">
                             <section>
                                 <h3 className="uppercase tracking-[0.2em] text-xs font-bold mb-8 pb-4 border-b border-deep-espresso/5">Адрес доставки</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -84,10 +84,10 @@ export default function Index({ items, total, subtotal, deliveryFee, isDeliveryF
                                 </div>
                             </section>
 
-                            <div className="pt-12">
-                                <button 
+                            <div className="pt-8 lg:pt-12">
+                                <button
                                     disabled={processing}
-                                    className="w-full lg:w-auto px-20 bg-deep-espresso text-creamy-silk uppercase tracking-[0.4em] text-[11px] font-bold py-6 hover:bg-black transition-all duration-500 shadow-2xl disabled:opacity-50"
+                                    className="w-full lg:w-auto lg:px-20 bg-deep-espresso text-creamy-silk uppercase tracking-[0.24em] sm:tracking-[0.4em] text-[10px] sm:text-[11px] font-bold py-5 sm:py-6 hover:bg-black transition-all duration-500 shadow-2xl disabled:opacity-50"
                                 >
                                     {processing ? 'Обработка...' : 'Перейти к оплате'}
                                 </button>
@@ -99,7 +99,7 @@ export default function Index({ items, total, subtotal, deliveryFee, isDeliveryF
                     </div>
 
                     <div className="lg:col-span-5">
-                        <div className="bg-white p-12 border border-deep-espresso/5 sticky top-40">
+                        <div className="bg-white p-6 sm:p-8 lg:p-12 border border-deep-espresso/5 lg:sticky lg:top-40">
                             <h3 className="font-serif italic text-2xl mb-10">Ваш заказ</h3>
                             <div className="space-y-8 mb-12">
                                 {items.map((item) => (
@@ -135,7 +135,7 @@ export default function Index({ items, total, subtotal, deliveryFee, isDeliveryF
 
                             <div className="flex justify-between items-baseline pt-4">
                                 <span className="uppercase tracking-[0.3em] text-xs font-bold">Итого</span>
-                                <span className="text-4xl font-light">{total.toLocaleString()} ₽</span>
+                                <span className="text-3xl sm:text-4xl font-light">{total.toLocaleString()} ₽</span>
                             </div>
                         </div>
                     </div>

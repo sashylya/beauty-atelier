@@ -110,12 +110,12 @@ export default function Catalog({ products, filters }) {
         <BeautyLayout>
             <Head title="Каталог — Beauty Atelier" />
             
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <header className="mb-20">
-                    <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-12">
-                        <div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+                <header className="mb-12 lg:mb-20">
+                    <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 mb-10 lg:mb-12">
+                        <div className="w-full min-w-0">
                             <p className="uppercase tracking-[0.3em] text-[10px] font-semibold text-champagne-gold mb-4">Наши основы</p>
-                            <h1 className="font-serif italic text-6xl text-deep-espresso">
+                            <h1 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-deep-espresso break-words">
                                 {filters.search ? 'Поиск' : 'Коллекция'}
                             </h1>
                             {filters.search && (
@@ -127,7 +127,7 @@ export default function Catalog({ products, filters }) {
                                 </p>
                             )}
                         </div>
-                        <div className="flex flex-wrap gap-x-10 gap-y-4 uppercase tracking-[0.2em] text-[10px] font-semibold text-deep-espresso/40">
+                        <div className="flex flex-wrap md:justify-end gap-x-7 sm:gap-x-10 gap-y-4 uppercase tracking-[0.2em] text-[10px] font-semibold text-deep-espresso/40">
                             <Link href={route('catalog.index')} className={!filters.category ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Все</Link>
                             <Link href={route('catalog.index', { category: 'face' })} className={filters.category === 'face' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Лицо</Link>
                             <Link href={route('catalog.index', { category: 'eyes' })} className={filters.category === 'eyes' ? 'text-deep-espresso border-b border-deep-espresso' : 'hover:text-deep-espresso transition'}>Глаза</Link>
@@ -135,11 +135,11 @@ export default function Catalog({ products, filters }) {
                         </div>
                     </div>
                     
-                    <div className="flex justify-between items-center py-4 border-y border-deep-espresso/10">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 py-4 border-y border-deep-espresso/10">
                          <div className="uppercase tracking-[0.2em] text-[9px] font-semibold opacity-60">
                             {products.length} Товаров
                          </div>
-                         <div className="flex space-x-12 items-center uppercase tracking-[0.2em] text-[9px] font-semibold">
+                         <div className="flex flex-col sm:flex-row sm:space-x-8 lg:space-x-12 gap-4 sm:gap-0 sm:items-center uppercase tracking-[0.2em] text-[9px] font-semibold">
                             <div className="flex items-center gap-4">
                                 <button 
                                     onClick={() => setShowFilters(!showFilters)}
@@ -166,7 +166,7 @@ export default function Catalog({ products, filters }) {
                                 <select 
                                     value={localFilters.sort}
                                     onChange={(e) => handleFilterChange('sort', e.target.value)}
-                                    className="bg-transparent border-none p-0 text-[9px] uppercase tracking-[0.2em] font-bold focus:ring-0 cursor-pointer"
+                                    className="bg-transparent border-none p-0 text-[9px] uppercase tracking-[0.16em] sm:tracking-[0.2em] font-bold focus:ring-0 cursor-pointer max-w-full"
                                 >
                                     <option value="newest">Новинки</option>
                                     <option value="price_asc">Цена: По возрастанию</option>
@@ -179,7 +179,7 @@ export default function Catalog({ products, filters }) {
 
                     {showFilters && (
                         <div className="py-10 border-b border-deep-espresso/5 animate-fade-in">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
                                 <div>
                                     <p className="text-[10px] uppercase font-bold mb-6 tracking-widest">Цена</p>
                                     <div className="flex items-center gap-4">
@@ -231,7 +231,7 @@ export default function Catalog({ products, filters }) {
                                     </select>
                                 </div>
 
-                                <div className="flex items-end gap-4">
+                                <div className="flex flex-col sm:flex-row sm:items-end gap-4">
                                     <button 
                                         onClick={() => applyFilters(localFilters)}
                                         className="flex-1 bg-deep-espresso text-creamy-silk uppercase tracking-widest text-[10px] font-bold py-3 hover:bg-black transition duration-500"
@@ -250,7 +250,7 @@ export default function Catalog({ products, filters }) {
                     )}
                 </header>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 lg:gap-x-12 gap-y-12">
                     {products.map((product) => (
                         <div key={product.id} className="group">
                             <Link href={route('catalog.show', product.slug)} className="block">
@@ -311,12 +311,12 @@ export default function Catalog({ products, filters }) {
                                 {product.skus && product.skus.length > 0 && product.skus.some(s => s.stock > 0) ? (
                                     <button 
                                         onClick={() => addToCart(product.skus.find(s => s.stock > 0).id)}
-                                        className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-black pointer-events-none group-hover:pointer-events-auto"
+                                        className="w-full py-3 bg-deep-espresso text-creamy-silk text-[10px] uppercase tracking-widest font-bold opacity-100 translate-y-0 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-500 hover:bg-black md:pointer-events-none md:group-hover:pointer-events-auto"
                                     >
                                         В корзину
                                     </button>
                                 ) : (
-                                    <div className="w-full py-3 bg-red-800/5 text-red-800 text-[10px] uppercase tracking-widest font-bold opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 text-center">
+                                    <div className="w-full py-3 bg-red-800/5 text-red-800 text-[10px] uppercase tracking-widest font-bold opacity-100 translate-y-0 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-500 text-center">
                                         Нет в наличии
                                     </div>
                                 )}

@@ -15,9 +15,40 @@ export default function AdminLayout({ children }) {
     ];
 
     return (
-        <div className="flex h-screen bg-[#FDF5E6] font-sans text-[#3D2B1F]">
+        <div className="admin-shell min-h-screen lg:h-screen lg:flex bg-[#FDF5E6] font-sans text-[#3D2B1F]">
+            <header className="lg:hidden sticky top-0 z-30 bg-[#3D2B1F] text-[#FDF5E6] border-b border-[#FDF5E6]/10">
+                <div className="px-4 py-4 flex items-center justify-between gap-4">
+                    <Link href="/" className="block">
+                        <img src="/images/logo.png" alt="Beauty Atelier" className="h-9 w-auto brightness-0 invert" />
+                    </Link>
+                    <Link
+                        href={route('home')}
+                        className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#D4AF37]"
+                    >
+                        На сайт
+                    </Link>
+                </div>
+                <nav className="px-4 pb-4 overflow-x-auto hide-scrollbar">
+                    <div className="flex gap-2 min-w-max">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.label}
+                                href={item.href}
+                                className={`px-4 py-2 border text-[9px] uppercase tracking-[0.16em] font-medium ${
+                                    item.active
+                                        ? 'border-[#D4AF37] text-[#D4AF37]'
+                                        : 'border-[#FDF5E6]/10 text-[#FDF5E6]/70'
+                                }`}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </div>
+                </nav>
+            </header>
+
             {/* Sidebar */}
-            <aside className="w-72 bg-[#3D2B1F] text-[#FDF5E6] flex flex-col shadow-2xl z-10">
+            <aside className="hidden lg:flex w-72 bg-[#3D2B1F] text-[#FDF5E6] flex-col shadow-2xl z-10">
                 <div className="p-10 border-b border-[#FDF5E6]/10">
                     <Link href="/" className="block">
                         <img src="/images/logo.png" alt="Beauty Atelier" className="h-12 w-auto brightness-0 invert" />
@@ -59,9 +90,9 @@ export default function AdminLayout({ children }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative">
+            <main className="min-w-0 flex-1 lg:overflow-y-auto relative">
                 {/* Header Strip */}
-                <header className="h-20 bg-white/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between px-10 border-b border-[#3D2B1F]/5">
+                <header className="hidden lg:flex h-20 bg-white/50 backdrop-blur-sm sticky top-0 z-10 items-center justify-between px-10 border-b border-[#3D2B1F]/5">
                      <div className="text-[10px] uppercase tracking-[0.15em] text-[#3D2B1F]/50">
                         {new Date().toLocaleDateString('ru-RU', { weekday: 'long', month: 'long', day: 'numeric' })}
                      </div>
@@ -81,7 +112,7 @@ export default function AdminLayout({ children }) {
                      </div>
                 </header>
 
-                <div className="p-10 max-w-7xl mx-auto">
+                <div className="p-4 sm:p-6 lg:p-10 max-w-7xl mx-auto">
                     {children}
                 </div>
             </main>

@@ -27,32 +27,32 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
             <Head title="Beauty Atelier — Искусство цвета" />
 
             {/* 1. Hero Section */}
-            <section className="relative h-screen min-h-[700px] flex items-center bg-white overflow-hidden">
-                <div className="max-w-[1400px] w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    <div className="relative z-10 pl-10 md:pl-20">
-                        <p className="text-[11px] uppercase tracking-[0.4em] text-[#C8A47E] mb-12 font-medium">Новая эра бьюти индустрии</p>
+            <section className="relative min-h-[calc(100vh-73px)] lg:h-screen lg:min-h-[700px] flex items-center bg-white overflow-hidden py-12 sm:py-16 lg:py-0">
+                <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div className="relative z-10 md:pl-10 lg:pl-20">
+                        <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.28em] sm:tracking-[0.4em] text-[#C8A47E] mb-8 lg:mb-12 font-medium">Новая эра бьюти индустрии</p>
                         <h1 className="leading-none mb-10">
-                            <span className="font-serif text-[80px] md:text-[100px] text-black block tracking-tight">ОБЪЕКТ</span>
-                            <span className="font-serif italic text-[80px] md:text-[100px] text-[#5D2E18] block ml-0 md:ml-32">ЖЕЛАНИЯ</span>
+                            <span className="font-serif text-5xl sm:text-7xl lg:text-[100px] text-black block tracking-tight">ОБЪЕКТ</span>
+                            <span className="font-serif italic text-5xl sm:text-7xl lg:text-[100px] text-[#5D2E18] block ml-0 md:ml-20 lg:ml-32">ЖЕЛАНИЯ</span>
                         </h1>
-                        <p className="text-sm uppercase tracking-[0.1em] text-gray-500 max-w-md mb-16 leading-relaxed font-medium">
+                        <p className="text-xs sm:text-sm uppercase tracking-[0.1em] text-gray-500 max-w-md mb-10 lg:mb-16 leading-relaxed font-medium">
                             ваша коллекция - это ваше <br/>
                             вложение в искусство самовыражения. <br/>
                             мы создаем идеальную посадку цвета
                         </p>
-                        <div className="flex flex-wrap gap-8">
-                            <Link href="/catalog" className="inline-block border border-[#C8A47E] text-[#5D2E18] uppercase tracking-[0.15em] text-[10px] font-bold px-12 py-4 hover:bg-[#FDF5E6] transition-all min-w-[180px] text-center">в каталог</Link>
-                            <Link href="/master-classes" className="inline-block bg-[#8B5A2B] border border-[#8B5A2B] text-white uppercase tracking-[0.15em] text-[10px] font-bold px-12 py-4 hover:bg-[#6F4E37] transition-all min-w-[180px] text-center">мастер-классы</Link>
+                        <div className="grid grid-cols-1 sm:flex gap-4 sm:gap-6 lg:gap-8">
+                            <Link href="/catalog" className="inline-block border border-[#C8A47E] text-[#5D2E18] uppercase tracking-[0.15em] text-[10px] font-bold px-8 sm:px-12 py-4 hover:bg-[#FDF5E6] transition-all sm:min-w-[180px] text-center">в каталог</Link>
+                            <Link href="/master-classes" className="inline-block bg-[#8B5A2B] border border-[#8B5A2B] text-white uppercase tracking-[0.15em] text-[10px] font-bold px-8 sm:px-12 py-4 hover:bg-[#6F4E37] transition-all sm:min-w-[180px] text-center">мастер-классы</Link>
                         </div>
                     </div>
-                    <div className="relative h-full flex items-center justify-center">
-                        <div className="relative w-full max-w-[550px] aspect-square transition-all duration-700 ease-in-out">
+                    <div className="relative h-full flex items-center justify-center min-h-[320px] sm:min-h-[420px] md:min-h-0">
+                        <div className="relative w-full max-w-[320px] sm:max-w-[460px] lg:max-w-[550px] aspect-square transition-all duration-700 ease-in-out">
                             <img key={activeShade} src={shades[activeShade].image} alt={shades[activeShade].name} className="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.1)] animate-in fade-in duration-500" />
                         </div>
-                        <div className="absolute bottom-10 right-10 md:right-0 bg-white/50 backdrop-blur-sm border border-[#C8A47E]/20 p-4 flex gap-4 shadow-xl rounded-sm">
-                            <div className="flex gap-4 border border-[#C8A47E]/40 p-2">
+                        <div className="absolute bottom-0 right-0 sm:bottom-6 lg:bottom-10 lg:right-0 bg-white/70 backdrop-blur-sm border border-[#C8A47E]/20 p-3 sm:p-4 flex gap-4 shadow-xl rounded-sm">
+                            <div className="flex gap-3 sm:gap-4 border border-[#C8A47E]/40 p-2">
                                 {shades.map((shade, index) => (
-                                    <button key={shade.id} onMouseEnter={() => setActiveShade(index)} className={`w-10 h-10 rounded-full border-2 transition-all duration-500 ${activeShade === index ? 'border-black scale-110 shadow-lg' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-105'}`} style={{ backgroundColor: shade.color, boxShadow: activeShade === index ? `0 0 15px ${shade.color}80` : 'none' }} />
+                                    <button key={shade.id} onMouseEnter={() => setActiveShade(index)} onClick={() => setActiveShade(index)} className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-500 ${activeShade === index ? 'border-black scale-110 shadow-lg' : 'border-transparent opacity-80 hover:opacity-100 hover:scale-105'}`} style={{ backgroundColor: shade.color, boxShadow: activeShade === index ? `0 0 15px ${shade.color}80` : 'none' }} />
                                 ))}
                             </div>
                         </div>
@@ -100,12 +100,12 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
             </section>
 
             {/* 4. Best Sellers Slider (DYNAMIC) */}
-            <section className="py-32 bg-white overflow-hidden">
-                <div className="max-w-[1400px] mx-auto px-6">
-                    <div className="flex justify-between items-end mb-20">
+            <section className="py-16 sm:py-24 lg:py-32 bg-white overflow-hidden">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+                    <div className="flex justify-between items-end gap-6 mb-12 lg:mb-20">
                         <div>
                             <p className="text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] mb-4 font-bold">Самое любимое</p>
-                            <h2 className="font-serif text-5xl text-[#3D2B1F]">Хиты продаж</h2>
+                            <h2 className="font-serif text-3xl sm:text-5xl text-[#3D2B1F]">Хиты продаж</h2>
                         </div>
                         {hitProducts && hitProducts.length > 3 && (
                             <div className="flex gap-4">
@@ -158,10 +158,10 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
             </section>
 
             {/* 5. Visit Atelier (Dark) */}
-            <section className="bg-[#6F3C28] py-40 text-center px-6">
+            <section className="bg-[#6F3C28] py-20 sm:py-28 lg:py-40 text-center px-4 sm:px-6">
                 <div className="max-w-4xl mx-auto">
                     <p className="uppercase tracking-[0.3em] text-[10px] font-bold text-[#D4AF37] mb-8">Уникальный опыт</p>
-                    <h2 className="font-serif text-6xl text-white mb-12">Посетите <br/> Ателье</h2>
+                    <h2 className="font-serif text-4xl sm:text-6xl text-white mb-8 sm:mb-12">Посетите <br/> Ателье</h2>
                     <p className="text-white/70 font-light max-w-xl mx-auto mb-16 leading-relaxed text-sm">
                         За продуктом стоит процесс. Присоединяйтесь к нашим
                         мастерам-колористам на закрытых сессиях в центре
@@ -179,10 +179,10 @@ export default function Welcome({ auth, look, hitProducts, latestPosts }) {
             </section>
 
             {/* 6. Diary */}
-            <section className="py-32 bg-white">
-                <div className="max-w-[1400px] mx-auto px-6">
-                    <div className="flex justify-between items-end mb-20 border-b border-gray-100 pb-8">
-                        <h2 className="font-serif text-5xl text-[#4A4A4A]">Дневник <br/> Ателье</h2>
+            <section className="py-16 sm:py-24 lg:py-32 bg-white">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-12 lg:mb-20 border-b border-gray-100 pb-8">
+                        <h2 className="font-serif text-3xl sm:text-5xl text-[#4A4A4A]">Дневник <br/> Ателье</h2>
                         <Link href={route('blog.index')} className="uppercase tracking-[0.2em] text-[10px] font-bold text-gray-400 hover:text-[#8B5A2B] transition mb-2">Больше новостей</Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

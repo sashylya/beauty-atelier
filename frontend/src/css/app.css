@@ -5,6 +5,79 @@
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 767px) {
+    h1,
+    h2,
+    h3 {
+        overflow-wrap: anywhere;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    .tracking-\[0\.4em\] {
+        letter-spacing: 0.24em;
+    }
+
+    .tracking-\[0\.3em\] {
+        letter-spacing: 0.18em;
+    }
+
+    .tracking-\[0\.2em\] {
+        letter-spacing: 0.14em;
+    }
+}
+
+.admin-shell .overflow-hidden:has(table),
+.admin-container {
+    overflow-x: auto;
+}
+
+.admin-shell table,
+.admin-table {
+    min-width: 760px;
+}
+
+@media (max-width: 1023px) {
+    .admin-shell table,
+    .admin-table {
+        min-width: 720px;
+    }
+
+    .admin-shell th,
+    .admin-shell td,
+    .admin-table th,
+    .admin-table td {
+        white-space: nowrap;
+    }
+}
+
 /* Authentication Pages Styling */
 .auth-page {
     min-height: 100vh;
@@ -25,7 +98,7 @@
 .auth-card {
     width: 100%;
     margin-top: 1.5rem;
-    padding: 2.5rem 2rem;
+    padding: 2rem 1.25rem;
     background-color: #ffffff;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     overflow: hidden;
@@ -35,6 +108,7 @@
 @media (min-width: 640px) {
     .auth-card {
         max-width: 28rem;
+        padding: 2.5rem 2rem;
         border-radius: 0.5rem;
     }
 }
@@ -174,6 +248,8 @@
     align-items: center;
     justify-content: space-between;
     margin-top: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .pass-check-grid {
